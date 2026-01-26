@@ -49,31 +49,50 @@ export default function BookmarksView() {
     const deleteBookmark = async (id) => {
         if (!confirm('Are you sure you want to delete this bookmark?')) return
 
+        console.log('🗑️ Starting delete for bookmark ID:', id)
+        console.log('👤 Current user:', user?.id)
+
         try {
             // Manual cascading delete: remove related entries in bookmark_tags first
+            console.log('📌 Step 1: Deleting bookmark_tags...')
             const { error: tagError } = await supabase
                 .from('bookmark_tags')
                 .delete()
                 .eq('bookmark_id', id)
 
             if (tagError) {
-                console.error('Error deleting related tags:', tagError)
+                console.error('⚠️ Error deleting related tags:', tagError)
                 // Continue trying to delete bookmark even if tag delete fails/returns empty
+            } else {
+                console.log('✅ bookmark_tags deleted successfully')
             }
 
             // Now delete the bookmark
-            const { error } = await supabase
+            console.log('📌 Step 2: Deleting bookmark...')
+            const { error, data } = await supabase
                 .from('bookmarks')
                 .delete()
                 .eq('id', id)
+                .eq('user_id', user.id) // Ensure user owns this bookmark
 
-            if (error) throw error
+            if (error) {
+                console.error('❌ Bookmark delete error:', error)
+                throw error
+            }
+
+            console.log('✅ Bookmark deleted successfully:', data)
 
             // Update local state immediately
             setBookmarks(prev => prev.filter((b) => b.id !== id))
+
+            // Fallback: reload page after 1 second if state update doesn't work
+            setTimeout(() => {
+                console.log('🔄 Reloading page to ensure UI is in sync...')
+                window.location.reload()
+            }, 1000)
         } catch (error) {
-            console.error('Error deleting bookmark:', error)
-            alert(`Failed to delete bookmark: ${error.message}`)
+            console.error('❌ Error deleting bookmark:', error)
+            alert(`Failed to delete bookmark: ${error.message}\n\nPlease check the console for details.`)
         }
     }
 
