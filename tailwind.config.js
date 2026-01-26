@@ -1,0 +1,22 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./index.html",
+        "./src/**/*.{js,ts,jsx,tsx}",
+        "./node_modules/flyonui/dist/js/*.js"
+    ],
+    theme: {
+        extend: {
+            colors: {
+                background: '#121212',
+                surface: '#181818',
+                accent: '#1DB954',
+                primaryText: '#FFFFFF',
+                secondaryText: '#B3B3B3',
+            }
+        },
+    },
+    plugins: [
+        require('flyonui')
+    ],
+}
