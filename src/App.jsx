@@ -6,6 +6,7 @@ import DashboardLayout from './layouts/DashboardLayout'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import BookmarksView from './pages/BookmarksView'
+import FavoritesView from './pages/FavoritesView'
 import Settings from './pages/Settings'
 import AddBookmarkModal from './components/AddBookmarkModal'
 import InstallPWA from './components/InstallPWA'
@@ -31,6 +32,7 @@ function App() {
               }
             >
               <Route index element={<BookmarksView />} />
+              <Route path="favorites" element={<FavoritesView />} />
               <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>

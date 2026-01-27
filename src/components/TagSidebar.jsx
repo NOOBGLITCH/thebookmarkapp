@@ -16,6 +16,12 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
             fetchTags()
         }
 
+        // Listen for tag refresh events
+        const handleRefreshTags = () => {
+            fetchTags()
+        }
+        window.addEventListener('refreshTags', handleRefreshTags)
+
         // Close menu/input when clicking outside
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -23,7 +29,10 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
             }
         }
         document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+            window.removeEventListener('refreshTags', handleRefreshTags)
+        }
     }, [user])
 
     const fetchTags = async () => {
@@ -46,7 +55,11 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                 count: tag.bookmark_tags?.length || 0
             }))
 
-            setTags(tagsWithCounts)
+            // Filter out tags with 0 bookmarks (orphaned tags)
+            const activeTags = tagsWithCounts.filter(tag => tag.count > 0)
+
+            console.log('🏷️ Tags fetched:', tagsWithCounts.length, 'Active:', activeTags.length)
+            setTags(activeTags)
         } catch (error) {
             console.error('Error fetching tags:', error)
         } finally {

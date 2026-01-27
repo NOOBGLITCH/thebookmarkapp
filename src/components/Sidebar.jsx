@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import FolderManager from './FolderManager'
@@ -9,6 +9,26 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     const navigate = useNavigate()
     const [selectedTag, setSelectedTag] = useState(null)
     const [selectedFolder, setSelectedFolder] = useState(null)
+    const [favoritesCount, setFavoritesCount] = useState(0)
+
+    // Update favorites count
+    useEffect(() => {
+        const updateCount = () => {
+            const saved = localStorage.getItem('bookmarkFavorites')
+            const favorites = saved ? JSON.parse(saved) : []
+            console.log('💖 Favorites count updated:', favorites.length)
+            setFavoritesCount(favorites.length)
+        }
+
+        updateCount()
+        window.addEventListener('storage', updateCount)
+        window.addEventListener('favoritesChanged', updateCount)
+
+        return () => {
+            window.removeEventListener('storage', updateCount)
+            window.removeEventListener('favoritesChanged', updateCount)
+        }
+    }, [])
 
     const handleLogout = async () => {
         await signOut()
@@ -85,6 +105,25 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                             >
                                 <span className="material-icons-round">dashboard</span>
                                 <span className="font-medium">Dashboard</span>
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                to="/dashboard/favorites"
+                                className={({ isActive }) =>
+                                    `flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${isActive
+                                        ? 'bg-accent text-white shadow-lg shadow-accent/20'
+                                        : 'text-secondaryText hover:text-primaryText hover:bg-gray-800'
+                                    }`
+                                }
+                            >
+                                <span className="material-icons-round">favorite</span>
+                                <span className="font-medium flex-1">Favorites</span>
+                                {favoritesCount > 0 && (
+                                    <span className="px-2 py-0.5 text-xs rounded-full bg-red-500 text-white font-semibold transition-all duration-300 animate-pulse">
+                                        {favoritesCount}
+                                    </span>
+                                )}
                             </NavLink>
                         </li>
                         <li>
