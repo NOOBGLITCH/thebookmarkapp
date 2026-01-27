@@ -100,16 +100,6 @@ BEGIN
     RAISE NOTICE '🔄 Merged % duplicate tags', deleted_dupes;
 
     -- ============================================
-    -- STEP 6: Remove duplicate bookmark_tags entries
-    -- (same bookmark + tag combination)
-    -- ============================================
-    DELETE FROM public.bookmark_tags a
-    USING public.bookmark_tags b
-    WHERE a.id > b.id
-    AND a.bookmark_id = b.bookmark_id
-    AND a.tag_id = b.tag_id;
-
-    -- ============================================
     -- FINAL SUMMARY
     -- ============================================
     RAISE NOTICE '================================';
