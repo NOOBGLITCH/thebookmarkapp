@@ -212,6 +212,8 @@ export default function AddBookmarkModal() {
 
             // Trigger refresh instead of page reload
             triggerRefresh()
+            // Trigger tag refresh immediately
+            window.dispatchEvent(new CustomEvent('refreshTags'))
             closeAddModal()
         } catch (error) {
             console.error('Error saving bookmark:', error)

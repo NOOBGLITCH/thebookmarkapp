@@ -16,17 +16,25 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         const updateCount = () => {
             const saved = localStorage.getItem('bookmarkFavorites')
             const favorites = saved ? JSON.parse(saved) : []
-            console.log('💖 Favorites count updated:', favorites.length)
             setFavoritesCount(favorites.length)
         }
 
         updateCount()
         window.addEventListener('storage', updateCount)
-        window.addEventListener('favoritesChanged', updateCount)
+
+        // Custom event for same-tab updates - use detail if available for instant update
+        const handleFavChange = (e) => {
+            if (e.detail) {
+                setFavoritesCount(e.detail.length)
+            } else {
+                updateCount()
+            }
+        }
+        window.addEventListener('favoritesChanged', handleFavChange)
 
         return () => {
             window.removeEventListener('storage', updateCount)
-            window.removeEventListener('favoritesChanged', updateCount)
+            window.removeEventListener('favoritesChanged', handleFavChange)
         }
     }, [])
 

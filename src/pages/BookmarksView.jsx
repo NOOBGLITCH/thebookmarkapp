@@ -38,13 +38,20 @@ export default function BookmarksView() {
     }, [favorites])
 
     const toggleFavorite = (bookmarkId) => {
-        setFavorites(prev =>
-            prev.includes(bookmarkId)
+        // Optimistic update
+        setFavorites(prev => {
+            const newFavorites = prev.includes(bookmarkId)
                 ? prev.filter(id => id !== bookmarkId)
                 : [...prev, bookmarkId]
-        )
-        // Dispatch event for sidebar to update count
-        window.dispatchEvent(new CustomEvent('favoritesChanged'))
+
+            // Sync with localStorage immediately
+            localStorage.setItem('bookmarkFavorites', JSON.stringify(newFavorites))
+
+            // Dispatch event for sidebar immediately
+            window.dispatchEvent(new CustomEvent('favoritesChanged', { detail: newFavorites }))
+
+            return newFavorites
+        })
     }
 
     const fetchBookmarks = async () => {
@@ -88,37 +95,8 @@ export default function BookmarksView() {
         console.log('👤 Current user:', user?.id)
 
         try {
-            // Manual cascading delete: remove related entries in bookmark_tags first
-            console.log('📌 Step 1: Deleting bookmark_tags...')
-            const { error: tagError } = await supabase
-                .from('bookmark_tags')
-                .delete()
-                .eq('bookmark_id', id)
-
-            if (tagError) {
-                console.error('⚠️ Error deleting related tags:', tagError)
-                // Continue trying to delete bookmark even if tag delete fails/returns empty
-            } else {
-                console.log('✅ bookmark_tags deleted successfully')
-            }
-
-            // Now delete the bookmark
-            console.log('📌 Step 2: Deleting bookmark...')
-            const { error, data } = await supabase
-                .from('bookmarks')
-                .delete()
-                .eq('id', id)
-                .eq('user_id', user.id) // Ensure user owns this bookmark
-
-            if (error) {
-                console.error('❌ Bookmark delete error:', error)
-                throw error
-            }
-
-            console.log('✅ Bookmark deleted successfully:', data)
-
-            // Update local state immediately
-            setBookmarks(prev => prev.filter((b) => b.id !== id))
+            // OPTIMISTIC UPDATE: Remove from UI immediately
+            setBookmarks(prev => prev.filter(b => b.id !== id))
 
             // Remove from favorites if it was favorited
             const saved = localStorage.getItem('bookmarkFavorites')
@@ -127,15 +105,37 @@ export default function BookmarksView() {
                 if (favorites.includes(id)) {
                     const newFavorites = favorites.filter(fid => fid !== id)
                     localStorage.setItem('bookmarkFavorites', JSON.stringify(newFavorites))
-                    window.dispatchEvent(new CustomEvent('favoritesChanged'))
+                    window.dispatchEvent(new CustomEvent('favoritesChanged', { detail: newFavorites }))
                 }
             }
 
-            // Trigger tag refresh to remove orphaned tags
+            // Trigger tag refresh immediately
             window.dispatchEvent(new CustomEvent('refreshTags'))
+
+            // Manual cascading delete: remove related entries in bookmark_tags first
+            const { error: tagError } = await supabase
+                .from('bookmark_tags')
+                .delete()
+                .eq('bookmark_id', id)
+
+            if (tagError) {
+                console.error('⚠️ Error deleting related tags:', tagError)
+            }
+
+            // Now delete the bookmark
+            const { error } = await supabase
+                .from('bookmarks')
+                .delete()
+                .eq('id', id)
+                .eq('user_id', user.id)
+
+            if (error) throw error
+
         } catch (error) {
             console.error('❌ Error deleting bookmark:', error)
-            alert(`Failed to delete bookmark: ${error.message}\n\nPlease check the console for details.`)
+            alert(`Failed to delete bookmark: ${error.message}`)
+            // Revert on error (optional, but good practice)
+            fetchBookmarks()
         }
     }
 

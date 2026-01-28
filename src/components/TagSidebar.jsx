@@ -18,7 +18,10 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
 
         // Listen for tag refresh events
         const handleRefreshTags = () => {
-            fetchTags()
+            console.log('🔄 Refreshing tags...')
+            if (user) {
+                fetchTags()
+            }
         }
         window.addEventListener('refreshTags', handleRefreshTags)
 
@@ -41,8 +44,8 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                 .from('tags')
                 .select(`
           id,
+          id,
           name,
-          is_public,
           bookmark_tags(count)
         `)
                 .eq('user_id', user.id)
