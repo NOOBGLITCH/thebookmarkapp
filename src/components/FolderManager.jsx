@@ -1,24 +1,81 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 
 export default function FolderManager({ onSelectFolder }) {
+    const { user } = useAuth()
     const [folders, setFolders] = useState([])
     const [showCreateFolder, setShowCreateFolder] = useState(false)
     const [newFolderName, setNewFolderName] = useState('')
     const [selectedFolder, setSelectedFolder] = useState(null)
+    const [menuOpenId, setMenuOpenId] = useState(null)
+    const [shareCopiedId, setShareCopiedId] = useState(null)
+    const menuRef = useRef(null)
+
+    useEffect(() => {
+        if (!user?.id) return
+        supabase.from('folders').select('id, name, parent_id, visibility, is_public').eq('user_id', user.id).order('name').then(({ data }) => {
+            if (data) setFolders(data)
+        })
+    }, [user?.id])
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpenId(null)
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
+    const toggleFolderVisibility = async (folder, e) => {
+        e.stopPropagation()
+        try {
+            const nextVisibility = (folder.visibility === 'public' || folder.is_public) ? 'private' : 'public'
+            const isPublic = nextVisibility === 'public'
+            const { error } = await supabase.from('folders').update({ visibility: nextVisibility, is_public: isPublic }).eq('id', folder.id).eq('user_id', user.id)
+            if (error) throw error
+            setFolders((prev) => prev.map((f) => (f.id === folder.id ? { ...f, visibility: nextVisibility, is_public: isPublic } : f)))
+            setMenuOpenId(null)
+        } catch (err) {
+            console.error('Toggle folder visibility failed:', err)
+            alert('Failed to update folder: ' + (err.message || 'Unknown error'))
+        }
+    }
+
+    const copyFolderPublicLink = async (folder, e) => {
+        e.stopPropagation()
+        try {
+            const { data, error } = await supabase.rpc('create_folder_share', {
+                resource_id: folder.id,
+                expires_at: null,
+                permission_level: 'view'
+            })
+            if (error) throw error
+            const token = data?.[0]?.token
+            if (!token) throw new Error('No token returned')
+            const url = `${window.location.origin}/shared/folder/${token}`
+            await navigator.clipboard.writeText(url)
+            setShareCopiedId(folder.id)
+            setTimeout(() => setShareCopiedId(null), 2000)
+            setMenuOpenId(null)
+        } catch (err) {
+            console.error('Share failed:', err)
+            alert('Failed to create share link: ' + (err.message || 'Unknown error'))
+        }
+    }
 
     const handleCreateFolder = async () => {
         if (!newFolderName.trim()) return
 
         try {
-            const { supabase } = await import('../lib/supabase')
-            const { data: { user } } = await supabase.auth.getUser()
-
             const { data, error } = await supabase
                 .from('folders')
                 .insert({
                     name: newFolderName,
                     user_id: user.id,
-                    parent_id: null
+                    parent_id: null,
+                    visibility: 'private',
+                    is_public: false
                 })
                 .select()
                 .single()
@@ -100,19 +157,42 @@ export default function FolderManager({ onSelectFolder }) {
                         </button>
                     </li>
                     {folders.map(folder => (
-                        <li key={folder.id}>
-                            <button
-                                onClick={() => handleSelectFolderInternal(folder.id)}
-                                className={`w-full text-left px-3 py-2 rounded transition text-sm flex items-center gap-2 ${selectedFolder === folder.id
-                                    ? 'bg-accent/20 text-accent font-medium'
-                                    : 'text-secondaryText hover:bg-gray-800 hover:text-primaryText'
-                                    }`}
-                            >
-                                <span className="material-icons-round text-base opacity-70">
-                                    {selectedFolder === folder.id ? 'folder_open' : 'folder'}
-                                </span>
-                                <span className="truncate">{folder.name}</span>
-                            </button>
+                        <li key={folder.id} className="relative group">
+                            <div className={`flex items-center justify-between px-3 py-2 rounded transition text-sm ${selectedFolder === folder.id ? 'bg-accent/20 text-accent font-medium' : 'text-secondaryText hover:bg-gray-800 hover:text-primaryText'}`}>
+                                <button
+                                    onClick={() => handleSelectFolderInternal(folder.id)}
+                                    className="flex-1 flex items-center gap-2 truncate text-left"
+                                >
+                                    <span className="material-icons-round text-base opacity-70">
+                                        {selectedFolder === folder.id ? 'folder_open' : 'folder'}
+                                    </span>
+                                    <span className="truncate">{folder.name}</span>
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === folder.id ? null : folder.id) }}
+                                    className="p-0.5 hover:bg-gray-700 rounded opacity-0 group-hover:opacity-100 transition"
+                                >
+                                    <span className="material-icons-round text-base">more_horiz</span>
+                                </button>
+                            </div>
+                            {menuOpenId === folder.id && (
+                                <div ref={menuRef} className="absolute right-0 top-full mt-1 w-48 bg-surface border border-gray-700 rounded shadow-xl z-50 py-1">
+                                    <button
+                                        onClick={(e) => copyFolderPublicLink(folder, e)}
+                                        className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
+                                    >
+                                        <span className="material-icons-round text-base">link</span>
+                                        {shareCopiedId === folder.id ? 'Copied!' : 'Copy public link'}
+                                    </button>
+                                    <button
+                                        onClick={(e) => toggleFolderVisibility(folder, e)}
+                                        className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
+                                    >
+                                        <span className="material-icons-round text-base">{(folder.visibility === 'public' || folder.is_public) ? 'lock' : 'public'}</span>
+                                        {(folder.visibility === 'public' || folder.is_public) ? 'Make Private' : 'Make Public'}
+                                    </button>
+                                </div>
+                            )}
                         </li>
                     ))}
                 </ul>

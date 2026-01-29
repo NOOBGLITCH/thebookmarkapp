@@ -34,20 +34,50 @@ export const AuthProvider = ({ children }) => {
     }, [])
 
     const signUp = async (email, password) => {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-        })
-        return { data, error }
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: { emailRedirectTo: undefined },
+            })
+            if (error) return { data: null, error }
+            return { data, error }
+        } catch (err) {
+            const msg = err?.message || String(err)
+            if (msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('network') || msg.toLowerCase().includes('failed to fetch')) {
+                return {
+                    data: null,
+                    error: {
+                        message: 'FETCH_FAILED',
+                    },
+                }
+            }
+            return { data: null, error: { message: msg } }
+        }
     }
 
     const signIn = async (email, password) => {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        })
-        return { data, error }
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            })
+            return { data, error }
+        } catch (err) {
+            const msg = err?.message || String(err)
+            if (msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('network') || msg.toLowerCase().includes('failed to fetch')) {
+                return {
+                    data: null,
+                    error: {
+                        message: 'FETCH_FAILED',
+                    },
+                }
+            }
+            return { data: null, error: { message: msg } }
+        }
     }
+
+    const getSupabaseUrl = () => typeof import.meta.env?.VITE_SUPABASE_URL === 'string' ? import.meta.env.VITE_SUPABASE_URL : ''
 
     const signOut = async () => {
         const { error } = await supabase.auth.signOut()
@@ -60,6 +90,7 @@ export const AuthProvider = ({ children }) => {
         signUp,
         signIn,
         signOut,
+        getSupabaseUrl,
     }
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

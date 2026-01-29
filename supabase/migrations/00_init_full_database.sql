@@ -30,7 +30,7 @@ CREATE TABLE profiles (
 
 -- FOLDERS
 CREATE TABLE folders (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
     name TEXT NOT NULL,
     parent_id UUID REFERENCES folders(id) ON DELETE CASCADE,
@@ -40,7 +40,7 @@ CREATE TABLE folders (
 
 -- TAGS
 CREATE TABLE tags (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
     name TEXT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -49,7 +49,7 @@ CREATE TABLE tags (
 
 -- BOOKMARKS
 CREATE TABLE bookmarks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
     folder_id UUID REFERENCES folders(id) ON DELETE SET NULL,
     url TEXT NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE bookmark_tags (
 
 -- API KEYS
 CREATE TABLE api_keys (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
     service TEXT NOT NULL,
     encrypted_key TEXT NOT NULL,

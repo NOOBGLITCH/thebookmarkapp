@@ -12,6 +12,7 @@ export default function BookmarksView() {
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedTag, setSelectedTag] = useState(null)
     const [selectedBookmarks, setSelectedBookmarks] = useState([])
+    const [shareCopiedId, setShareCopiedId] = useState(null)
     const [favorites, setFavorites] = useState(() => {
         const saved = localStorage.getItem('bookmarkFavorites')
         return saved ? JSON.parse(saved) : []
@@ -36,6 +37,27 @@ export default function BookmarksView() {
     useEffect(() => {
         localStorage.setItem('bookmarkFavorites', JSON.stringify(favorites))
     }, [favorites])
+
+    const copyBookmarkPublicLink = async (bookmark, e) => {
+        e.stopPropagation()
+        try {
+            const { data, error } = await supabase.rpc('create_bookmark_share', {
+                resource_id: bookmark.id,
+                expires_at: null,
+                permission_level: 'view'
+            })
+            if (error) throw error
+            const token = data?.[0]?.token
+            if (!token) throw new Error('No token returned')
+            const url = `${window.location.origin}/shared/bookmark/${token}`
+            await navigator.clipboard.writeText(url)
+            setShareCopiedId(bookmark.id)
+            setTimeout(() => setShareCopiedId(null), 2000)
+        } catch (err) {
+            console.error('Share failed:', err)
+            alert('Failed to create share link: ' + (err.message || 'Unknown error'))
+        }
+    }
 
     const toggleFavorite = (bookmarkId) => {
         // Optimistic update
@@ -89,7 +111,8 @@ export default function BookmarksView() {
     }
 
     const deleteBookmark = async (id) => {
-        if (!confirm('Are you sure you want to delete this bookmark?')) return
+        // Optimistic UI update immediately
+
 
         console.log('🗑️ Starting delete for bookmark ID:', id)
         console.log('👤 Current user:', user?.id)
@@ -109,27 +132,15 @@ export default function BookmarksView() {
                 }
             }
 
-            // Trigger tag refresh immediately
-            window.dispatchEvent(new CustomEvent('refreshTags'))
-
-            // Manual cascading delete: remove related entries in bookmark_tags first
-            const { error: tagError } = await supabase
-                .from('bookmark_tags')
-                .delete()
-                .eq('bookmark_id', id)
-
-            if (tagError) {
-                console.error('⚠️ Error deleting related tags:', tagError)
-            }
-
-            // Now delete the bookmark
-            const { error } = await supabase
-                .from('bookmarks')
-                .delete()
-                .eq('id', id)
-                .eq('user_id', user.id)
+            // Now delete the bookmark using RPC that cleans up tags
+            const { error } = await supabase.rpc('delete_bookmark_with_cleanup', {
+                p_bookmark_id: id
+            })
 
             if (error) throw error
+
+            // Trigger tag refresh AFTER successful delete to ensure counts are accurate
+            window.dispatchEvent(new CustomEvent('refreshTags'))
 
         } catch (error) {
             console.error('❌ Error deleting bookmark:', error)
@@ -142,14 +153,13 @@ export default function BookmarksView() {
     const handleBulkDelete = async () => {
         if (selectedBookmarks.length === 0) return
 
-        if (!confirm(`Delete ${selectedBookmarks.length} bookmark(s)?`)) return
+        // No confirm dialog for bulk delete either, based on user feedback
+
 
         try {
             for (const id of selectedBookmarks) {
-                // Delete bookmark_tags first
-                await supabase.from('bookmark_tags').delete().eq('bookmark_id', id)
-                // Delete bookmark
-                await supabase.from('bookmarks').delete().eq('id', id).eq('user_id', user.id)
+                // Delete bookmark using RPC (cleans up tags automatically)
+                await supabase.rpc('delete_bookmark_with_cleanup', { p_bookmark_id: id })
             }
 
             setBookmarks(prev => prev.filter(b => !selectedBookmarks.includes(b.id)))
@@ -384,6 +394,15 @@ export default function BookmarksView() {
                                                 </a>
                                             </h3>
                                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={(e) => copyBookmarkPublicLink(bookmark, e)}
+                                                    className="text-secondaryText hover:text-primaryText"
+                                                    title={shareCopiedId === bookmark.id ? 'Copied!' : 'Copy public link'}
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                    </svg>
+                                                </button>
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation()

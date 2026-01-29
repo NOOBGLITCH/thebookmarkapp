@@ -22,7 +22,9 @@ function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/shared/tag/:tagId" element={<SharedView />} />
+            <Route path="/shared/bookmark/:token" element={<SharedView />} />
+            <Route path="/shared/folder/:token" element={<SharedView />} />
+            <Route path="/shared/tag/:token" element={<SharedView />} />
             <Route
               path="/dashboard"
               element={

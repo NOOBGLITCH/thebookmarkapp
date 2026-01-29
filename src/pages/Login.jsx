@@ -9,6 +9,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false)
     const { signIn } = useAuth()
     const navigate = useNavigate()
+    const isFetchError = error && (error === 'FETCH_FAILED' || error.includes('fetch') || error.includes('Network'))
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -18,7 +19,7 @@ export default function Login() {
         const { error } = await signIn(email, password)
 
         if (error) {
-            setError(error.message)
+            setError(error.message || String(error))
             setLoading(false)
         } else {
             navigate('/dashboard')
@@ -32,8 +33,19 @@ export default function Login() {
                 <p className="text-center text-secondaryText mb-8">Sign in to your account</p>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500 rounded text-red-500 text-sm">
-                        {error}
+                    <div className="mb-4 p-4 bg-red-500/10 border border-red-500 rounded text-red-500 text-sm space-y-2">
+                        {isFetchError ? (
+                            <>
+                                <p className="font-semibold">Cannot reach Supabase (failed to fetch)</p>
+                                <ul className="list-disc list-inside text-xs space-y-1 text-secondaryText">
+                                    <li>Set <code className="bg-black/20 px-1 rounded">VITE_SUPABASE_URL</code> and <code className="bg-black/20 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> in <code className="bg-black/20 px-1 rounded">.env</code> (see <code className="bg-black/20 px-1 rounded">.env.example</code>)</li>
+                                    <li>Restart dev server</li>
+                                    <li><a href="https://supabase.com/dashboard/project/ezikhcxhnjlehfqclthn" target="_blank" rel="noopener noreferrer" className="text-accent underline">Dashboard</a> → resume project if paused</li>
+                                </ul>
+                            </>
+                        ) : (
+                            error
+                        )}
                     </div>
                 )}
 
@@ -62,7 +74,14 @@ export default function Login() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.ctrlKey && e.key.toLowerCase() === 'a') {
+                                    e.preventDefault()
+                                    e.target.select()
+                                }
+                            }}
                             required
+                            autoComplete="current-password"
                             className="w-full px-4 py-2 bg-background border border-gray-700 rounded focus:outline-none focus:border-accent text-primaryText"
                             placeholder="••••••••"
                         />

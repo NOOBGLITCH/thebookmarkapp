@@ -9,6 +9,7 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
     const [showCreateTag, setShowCreateTag] = useState(false)
     const [newTagName, setNewTagName] = useState('')
     const [menuOpenId, setMenuOpenId] = useState(null)
+    const [shareCopiedId, setShareCopiedId] = useState(null)
     const menuRef = useRef(null)
 
     useEffect(() => {
@@ -42,12 +43,7 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
         try {
             const { data, error } = await supabase
                 .from('tags')
-                .select(`
-          id,
-          id,
-          name,
-          bookmark_tags(count)
-        `)
+                .select('id, name, visibility, is_public, bookmark_tags(count)')
                 .eq('user_id', user.id)
                 .order('name')
 
@@ -79,6 +75,7 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                 .insert({
                     name: newTagName.trim(),
                     user_id: user.id,
+                    visibility: 'private',
                     is_public: false
                 })
                 .select()
@@ -97,19 +94,42 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
 
     const toggleTagVisibility = async (tag) => {
         try {
+            const nextVisibility = (tag.visibility === 'public' ? 'private' : 'public')
+            const isPublic = nextVisibility === 'public'
             const { error } = await supabase
                 .from('tags')
-                .update({ is_public: !tag.is_public })
+                .update({ visibility: nextVisibility, is_public: isPublic })
                 .eq('id', tag.id)
 
             if (error) throw error
 
             setTags(tags.map(t =>
-                t.id === tag.id ? { ...t, is_public: !t.is_public } : t
+                t.id === tag.id ? { ...t, visibility: nextVisibility, is_public: isPublic } : t
             ))
             setMenuOpenId(null)
         } catch (error) {
             console.error('Error updating tag:', error)
+        }
+    }
+
+    const copyPublicLink = async (tag) => {
+        try {
+            const { data, error } = await supabase.rpc('create_tag_share', {
+                resource_id: tag.id,
+                expires_at: null,
+                permission_level: 'view'
+            })
+            if (error) throw error
+            const token = data?.[0]?.token
+            if (!token) throw new Error('No token returned')
+            const url = `${window.location.origin}/shared/tag/${token}`
+            await navigator.clipboard.writeText(url)
+            setShareCopiedId(tag.id)
+            setTimeout(() => setShareCopiedId(null), 2000)
+            setMenuOpenId(null)
+        } catch (err) {
+            console.error('Share failed:', err)
+            alert('Failed to create share link: ' + (err.message || 'Unknown error'))
         }
     }
 
@@ -215,7 +235,7 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                                         >
                                             <span className="material-icons-round text-sm opacity-70 scale-75">label</span>
                                             <span className="truncate">{tag.name}</span>
-                                            {tag.is_public && (
+                                            {(tag.visibility === 'public' || tag.is_public) && (
                                                 <span className="material-icons-round text-xs text-blue-400">public</span>
                                             )}
                                         </button>
@@ -238,13 +258,20 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                                     {menuOpenId === tag.id && (
                                         <div ref={menuRef} className="absolute right-0 top-full mt-1 w-48 bg-surface border border-gray-700 rounded shadow-xl z-50 py-1">
                                             <button
+                                                onClick={() => copyPublicLink(tag)}
+                                                className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
+                                            >
+                                                <span className="material-icons-round text-base">link</span>
+                                                {shareCopiedId === tag.id ? 'Copied!' : 'Copy public link'}
+                                            </button>
+                                            <button
                                                 onClick={() => toggleTagVisibility(tag)}
                                                 className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
                                             >
                                                 <span className="material-icons-round text-base">
-                                                    {tag.is_public ? 'lock' : 'public'}
+                                                    {(tag.visibility === 'public' || tag.is_public) ? 'lock' : 'public'}
                                                 </span>
-                                                {tag.is_public ? 'Make Private' : 'Make Public'}
+                                                {(tag.visibility === 'public' || tag.is_public) ? 'Make Private' : 'Make Public'}
                                             </button>
                                             <button
                                                 onClick={() => deleteTag(tag.id)}

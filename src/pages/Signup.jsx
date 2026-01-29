@@ -9,8 +9,9 @@ export default function Signup() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
-    const { signUp } = useAuth()
+    const { signUp, getSupabaseUrl } = useAuth()
     const navigate = useNavigate()
+    const isFetchError = error === 'FETCH_FAILED' || (error && (error.includes('fetch') || error.includes('Network')))
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -29,7 +30,7 @@ export default function Signup() {
         const { error } = await signUp(email, password)
 
         if (error) {
-            setError(error.message)
+            setError(error.message || String(error))
             setLoading(false)
         } else {
             setSuccess(true)
@@ -45,8 +46,22 @@ export default function Signup() {
                 <p className="text-center text-secondaryText mb-8">Create your account</p>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500 rounded text-red-500 text-sm">
-                        {error}
+                    <div className="mb-4 p-4 bg-red-500/10 border border-red-500 rounded text-red-500 text-sm space-y-2">
+                        {isFetchError ? (
+                            <>
+                                <p className="font-semibold">Cannot reach Supabase (failed to fetch)</p>
+                                <p className="text-secondaryText text-xs">Try in order:</p>
+                                <ul className="list-disc list-inside text-xs space-y-1 text-secondaryText">
+                                    <li>Create <code className="bg-black/20 px-1 rounded">.env</code> or <code className="bg-black/20 px-1 rounded">.env.local</code> in the project root (copy from <code className="bg-black/20 px-1 rounded">.env.example</code>)</li>
+                                    <li>Set <code className="bg-black/20 px-1 rounded">VITE_SUPABASE_URL</code> to <code className="bg-black/20 px-1 rounded">https://ezikhcxhnjlehfqclthn.supabase.co</code></li>
+                                    <li>Set <code className="bg-black/20 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> from Dashboard → Settings → API → anon public</li>
+                                    <li>Restart dev server (<code className="bg-black/20 px-1 rounded">npm run dev</code>)</li>
+                                    <li>If project is paused: <a href="https://supabase.com/dashboard/project/ezikhcxhnjlehfqclthn" target="_blank" rel="noopener noreferrer" className="text-accent underline">Open Dashboard</a> and resume project</li>
+                                </ul>
+                            </>
+                        ) : (
+                            error
+                        )}
                     </div>
                 )}
 
@@ -81,7 +96,14 @@ export default function Signup() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.ctrlKey && e.key.toLowerCase() === 'a') {
+                                    e.preventDefault()
+                                    e.target.select()
+                                }
+                            }}
                             required
+                            autoComplete="new-password"
                             className="w-full px-4 py-2 bg-background border border-gray-700 rounded focus:outline-none focus:border-accent text-primaryText"
                             placeholder="••••••••"
                         />
@@ -96,7 +118,14 @@ export default function Signup() {
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.ctrlKey && e.key.toLowerCase() === 'a') {
+                                    e.preventDefault()
+                                    e.target.select()
+                                }
+                            }}
                             required
+                            autoComplete="new-password"
                             className="w-full px-4 py-2 bg-background border border-gray-700 rounded focus:outline-none focus:border-accent text-primaryText"
                             placeholder="••••••••"
                         />

@@ -214,6 +214,16 @@ export default function AddBookmarkModal() {
             triggerRefresh()
             // Trigger tag refresh immediately
             window.dispatchEvent(new CustomEvent('refreshTags'))
+
+            // Reset form fields only if it was a new bookmark (not editing)
+            if (!editingBookmark) {
+                setUrl('')
+                setTitle('')
+                setDescription('')
+                setTags([])
+                setSelectedFolderId(null)
+            }
+
             closeAddModal()
         } catch (error) {
             console.error('Error saving bookmark:', error)
