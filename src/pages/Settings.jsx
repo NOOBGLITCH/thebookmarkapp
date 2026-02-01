@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 export default function Settings() {
-    const { user } = useAuth()
+    const { user, signOut } = useAuth()
+    const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState('')
     const [error, setError] = useState('')
@@ -296,8 +298,8 @@ export default function Settings() {
                         <button
                             onClick={async () => {
                                 try {
-                                    await supabase.auth.signOut()
-                                    window.location.href = '/login'
+                                    await signOut()
+                                    navigate('/')
                                 } catch {
                                     setError('Failed to sign out')
                                 }

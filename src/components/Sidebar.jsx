@@ -40,7 +40,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
     const handleLogout = async () => {
         await signOut()
-        navigate('/login')
+        navigate('/')
     }
 
     const handleSelectTag = (tagName) => {
