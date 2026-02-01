@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { Plus, Check, X, FolderOpen, Folder, MoreHorizontal, Link, Lock, Globe } from 'lucide-react'
 
 export default function FolderManager({ onSelectFolder }) {
     const { user } = useAuth()
@@ -105,7 +106,7 @@ export default function FolderManager({ onSelectFolder }) {
                     className="text-secondaryText hover:text-accent transition"
                     title="Create Folder"
                 >
-                    <span className="material-icons-round text-lg">add</span>
+                    <Plus className="w-5 h-5" />
                 </button>
             </div>
 
@@ -125,7 +126,7 @@ export default function FolderManager({ onSelectFolder }) {
                         className="text-green-500 hover:bg-green-500/10 rounded transition p-0.5"
                         title="Create"
                     >
-                        <span className="material-icons-round text-lg">check</span>
+                        <Check className="w-4 h-4" />
                     </button>
                     <button
                         onClick={() => {
@@ -135,7 +136,7 @@ export default function FolderManager({ onSelectFolder }) {
                         className="text-red-500 hover:bg-red-500/10 rounded transition p-0.5"
                         title="Cancel"
                     >
-                        <span className="material-icons-round text-lg">close</span>
+                        <X className="w-4 h-4" />
                     </button>
                 </div>
             )}
@@ -152,7 +153,7 @@ export default function FolderManager({ onSelectFolder }) {
                                 : 'text-secondaryText hover:bg-gray-800 hover:text-primaryText'
                                 }`}
                         >
-                            <span className="material-icons-round text-base">folder_open</span>
+                            <FolderOpen className="w-4 h-4" />
                             All Bookmarks
                         </button>
                     </li>
@@ -163,16 +164,18 @@ export default function FolderManager({ onSelectFolder }) {
                                     onClick={() => handleSelectFolderInternal(folder.id)}
                                     className="flex-1 flex items-center gap-2 truncate text-left"
                                 >
-                                    <span className="material-icons-round text-base opacity-70">
-                                        {selectedFolder === folder.id ? 'folder_open' : 'folder'}
-                                    </span>
+                                    {selectedFolder === folder.id ? (
+                                        <FolderOpen className="w-4 h-4 opacity-70" />
+                                    ) : (
+                                        <Folder className="w-4 h-4 opacity-70" />
+                                    )}
                                     <span className="truncate">{folder.name}</span>
                                 </button>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === folder.id ? null : folder.id) }}
                                     className="p-0.5 hover:bg-gray-700 rounded opacity-0 group-hover:opacity-100 transition"
                                 >
-                                    <span className="material-icons-round text-base">more_horiz</span>
+                                    <MoreHorizontal className="w-4 h-4" />
                                 </button>
                             </div>
                             {menuOpenId === folder.id && (
@@ -181,14 +184,18 @@ export default function FolderManager({ onSelectFolder }) {
                                         onClick={(e) => copyFolderPublicLink(folder, e)}
                                         className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
                                     >
-                                        <span className="material-icons-round text-base">link</span>
+                                        <Link className="w-4 h-4" />
                                         {shareCopiedId === folder.id ? 'Copied!' : 'Copy public link'}
                                     </button>
                                     <button
                                         onClick={(e) => toggleFolderVisibility(folder, e)}
                                         className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
                                     >
-                                        <span className="material-icons-round text-base">{(folder.visibility === 'public' || folder.is_public) ? 'lock' : 'public'}</span>
+                                        {(folder.visibility === 'public' || folder.is_public) ? (
+                                            <Lock className="w-4 h-4" />
+                                        ) : (
+                                            <Globe className="w-4 h-4" />
+                                        )}
                                         {(folder.visibility === 'public' || folder.is_public) ? 'Make Private' : 'Make Public'}
                                     </button>
                                 </div>

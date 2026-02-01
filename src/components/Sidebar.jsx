@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import FolderManager from './FolderManager'
 import TagSidebar from './TagSidebar'
+import { Bookmark, X, Menu, LayoutDashboard, Heart, Settings, LogOut, User } from 'lucide-react'
 
 export default function Sidebar({ isOpen, setIsOpen }) {
     const { user, signOut } = useAuth()
@@ -73,7 +74,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             <div className="p-6 border-b border-gray-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-                        <span className="material-icons-round text-white">bookmarks</span>
+                        <Bookmark className="text-white w-5 h-5" />
                     </div>
                     <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                         FlowMark
@@ -83,14 +84,14 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     onClick={() => setIsOpen(false)}
                     className="text-secondaryText hover:text-white lg:hidden md:block"
                 >
-                    <span className="material-icons-round">close</span>
+                    <X className="w-6 h-6" />
                 </button>
                 <button
                     onClick={() => setIsOpen(false)}
                     className="text-secondaryText hover:text-white hidden lg:block"
                     title="Close Sidebar"
                 >
-                    <span className="material-icons-round">menu_open</span>
+                    <Menu className="w-6 h-6" />
                 </button>
             </div>
 
@@ -111,7 +112,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                                     }`
                                 }
                             >
-                                <span className="material-icons-round">dashboard</span>
+                                <LayoutDashboard className="w-5 h-5" />
                                 <span className="font-medium">Dashboard</span>
                             </NavLink>
                         </li>
@@ -125,7 +126,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                                     }`
                                 }
                             >
-                                <span className="material-icons-round">favorite</span>
+                                <Heart className="w-5 h-5" />
                                 <span className="font-medium flex-1">Favorites</span>
                                 {favoritesCount > 0 && (
                                     <span className="px-2 py-0.5 text-xs rounded-full bg-red-500 text-white font-semibold transition-all duration-300 animate-pulse">
@@ -144,7 +145,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                                     }`
                                 }
                             >
-                                <span className="material-icons-round">settings</span>
+                                <Settings className="w-5 h-5" />
                                 <span className="font-medium">Settings</span>
                             </NavLink>
                         </li>
@@ -159,6 +160,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                 <TagSidebar
                     onSelectTag={handleSelectTag}
                     selectedTag={selectedTag}
+                    selectedTagState={selectedTag}
                 />
             </nav>
 
@@ -167,12 +169,12 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     onClick={handleLogout}
                     className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondaryText hover:text-red-500 hover:bg-red-500/10 transition-all w-full"
                 >
-                    <span className="material-icons-round">logout</span>
+                    <LogOut className="w-5 h-5" />
                     <span className="font-medium">Log Out</span>
                 </button>
                 <div className="mt-4 px-3 flex items-center gap-3 text-sm text-secondaryText">
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                        <span className="material-icons-round text-sm">person</span>
+                        <User className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="truncate font-medium text-primaryText">{user?.email}</p>

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useEffect, useState } from 'react'
+import { Rocket, Zap, Tag, Shield, Smartphone, Share2, Search, ArrowRight, Github, PlayCircle, Bookmark } from 'lucide-react'
 
 export default function Landing() {
     const { user } = useAuth()
@@ -27,7 +28,7 @@ export default function Landing() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                     <div className="flex items-center gap-2 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
                         <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20 group-hover:scale-110 transition-transform">
-                            <span className="material-icons-round text-white">bookmarks</span>
+                            <Bookmark className="text-white w-6 h-6" />
                         </div>
                         <span className="text-2xl font-bold tracking-tight">FlowMark</span>
                     </div>
@@ -64,11 +65,11 @@ export default function Landing() {
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
                         <Link to="/signup" className="w-full sm:w-auto px-8 py-4 bg-accent hover:bg-accent/90 text-white font-bold rounded-xl shadow-xl shadow-accent/30 transition hover:scale-105 flex items-center justify-center gap-3">
-                            <i className="fa-solid fa-rocket"></i>
+                            <Rocket className="w-5 h-5" />
                             Start Organizing Free
                         </Link>
                         <a href="#demo" className="w-full sm:w-auto px-8 py-4 bg-surface border border-gray-700 hover:bg-gray-800 text-white font-bold rounded-xl transition hover:scale-105 flex items-center justify-center gap-3">
-                            <i className="fa-regular fa-circle-play"></i>
+                            <PlayCircle className="w-5 h-5" />
                             Watch Demo
                         </a>
                     </div>
@@ -109,7 +110,7 @@ export default function Landing() {
                         {/* Feature 1 */}
                         <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
                             <div className="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <i className="fa-solid fa-bolt text-2xl text-blue-500"></i>
+                                <Zap className="text-blue-500 w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">Superfast Extraction</h3>
                             <p className="text-secondaryText leading-relaxed">
@@ -120,7 +121,7 @@ export default function Landing() {
                         {/* Feature 2 */}
                         <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
                             <div className="w-14 h-14 bg-green-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <i className="fa-solid fa-tags text-2xl text-accent"></i>
+                                <Tag className="text-accent w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">Smart Auto-Tagging</h3>
                             <p className="text-secondaryText leading-relaxed">
@@ -131,7 +132,7 @@ export default function Landing() {
                         {/* Feature 3 */}
                         <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
                             <div className="w-14 h-14 bg-purple-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <i className="fa-solid fa-shield-halved text-2xl text-purple-500"></i>
+                                <Shield className="text-purple-500 w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">Privacy First</h3>
                             <p className="text-secondaryText leading-relaxed">
@@ -142,7 +143,7 @@ export default function Landing() {
                         {/* Feature 4 */}
                         <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
                             <div className="w-14 h-14 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <i className="fa-solid fa-mobile-screen text-2xl text-yellow-500"></i>
+                                <Smartphone className="text-yellow-500 w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">PWA & Offline Ready</h3>
                             <p className="text-secondaryText leading-relaxed">
@@ -153,7 +154,7 @@ export default function Landing() {
                         {/* Feature 5 */}
                         <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
                             <div className="w-14 h-14 bg-pink-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <i className="fa-solid fa-share-nodes text-2xl text-pink-500"></i>
+                                <Share2 className="text-pink-500 w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">Share & Collaborate</h3>
                             <p className="text-secondaryText leading-relaxed">
@@ -164,7 +165,7 @@ export default function Landing() {
                         {/* Feature 6 */}
                         <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
                             <div className="w-14 h-14 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <i className="fa-solid fa-magnifying-glass text-2xl text-cyan-500"></i>
+                                <Search className="text-cyan-500 w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">Instant Search</h3>
                             <p className="text-secondaryText leading-relaxed">
@@ -225,7 +226,7 @@ export default function Landing() {
                     </p>
                     <Link to="/signup" className="px-10 py-5 bg-white text-black font-bold rounded-xl hover:bg-gray-100 transition shadow-xl text-lg inline-flex items-center gap-2">
                         Get Started Now
-                        <i className="fa-solid fa-arrow-right"></i>
+                        <ArrowRight className="w-5 h-5" />
                     </Link>
                 </div>
             </section>
@@ -234,7 +235,7 @@ export default function Landing() {
             <footer className="border-t border-gray-800 py-12 bg-surface/30">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-2">
-                        <span className="material-icons-round text-accent">bookmarks</span>
+                        <Bookmark className="text-accent w-6 h-6" />
                         <span className="font-bold text-xl">FlowMark</span>
                     </div>
 
@@ -242,7 +243,7 @@ export default function Landing() {
                         <a href="#" className="hover:text-white transition">Privacy</a>
                         <a href="#" className="hover:text-white transition">Terms</a>
                         <a href="https://github.com/NOOBGLITCH/thebookmarkapp" target="_blank" rel="noreferrer" className="hover:text-white transition flex items-center gap-2">
-                            <i className="fa-brands fa-github"></i>
+                            <Github className="w-4 h-4" />
                             GitHub
                         </a>
                     </div>

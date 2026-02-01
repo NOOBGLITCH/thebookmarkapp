@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { ChevronRight, Plus, Check, X, Tag, Globe, MoreHorizontal, Link, Lock, Trash2 } from 'lucide-react'
 
 export default function TagSidebar({ onSelectTag, selectedTag }) {
     const { user } = useAuth()
@@ -164,7 +165,7 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                     className="w-full flex items-center justify-between group"
                 >
                     <div className="flex items-center gap-2">
-                        <span className={`material-icons-round text-secondaryText transition-transform ${isExpanded ? 'rotate-90' : ''}`}>chevron_right</span>
+                        <ChevronRight className={`text-secondaryText transition-transform w-5 h-5 ${isExpanded ? 'rotate-90' : ''}`} />
                         <h3 className="text-xs font-semibold text-secondaryText uppercase tracking-wide">
                             Tags ({tags.length})
                         </h3>
@@ -179,7 +180,7 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                         className="text-secondaryText hover:text-accent opacity-0 group-hover:opacity-100 transition p-1"
                         title="Create Tag"
                     >
-                        <span className="material-icons-round text-lg">add</span>
+                        <Plus className="w-5 h-5" />
                     </div>
                 </button>
             </div>
@@ -195,8 +196,8 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                         className="flex-1 min-w-0 px-2 py-1 bg-background border border-gray-700 rounded text-sm text-primaryText focus:outline-none focus:border-accent"
                         autoFocus
                     />
-                    <button onClick={handleCreateTag} className="text-green-500"><span className="material-icons-round">check</span></button>
-                    <button onClick={() => setShowCreateTag(false)} className="text-red-500"><span className="material-icons-round">close</span></button>
+                    <button onClick={handleCreateTag} className="text-green-500"><Check className="w-5 h-5" /></button>
+                    <button onClick={() => setShowCreateTag(false)} className="text-red-500"><X className="w-5 h-5" /></button>
                 </div>
             )}
 
@@ -233,10 +234,10 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                                             onClick={() => onSelectTag(tag.name)}
                                             className="flex-1 flex items-center gap-2 truncate text-left pl-6"
                                         >
-                                            <span className="material-icons-round text-sm opacity-70 scale-75">label</span>
+                                            <Tag className="w-3 h-3 opacity-70" />
                                             <span className="truncate">{tag.name}</span>
                                             {(tag.visibility === 'public' || tag.is_public) && (
-                                                <span className="material-icons-round text-xs text-blue-400">public</span>
+                                                <Globe className="w-3 h-3 text-blue-400" />
                                             )}
                                         </button>
 
@@ -250,7 +251,7 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                                                 }}
                                                 className="p-0.5 hover:bg-gray-700 rounded opacity-0 group-hover:opacity-100 transition-opacity flex items-center"
                                             >
-                                                <span className="material-icons-round text-base">more_horiz</span>
+                                                <MoreHorizontal className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </div>
@@ -261,23 +262,25 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                                                 onClick={() => copyPublicLink(tag)}
                                                 className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
                                             >
-                                                <span className="material-icons-round text-base">link</span>
+                                                <Link className="w-4 h-4" />
                                                 {shareCopiedId === tag.id ? 'Copied!' : 'Copy public link'}
                                             </button>
                                             <button
                                                 onClick={() => toggleTagVisibility(tag)}
                                                 className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
                                             >
-                                                <span className="material-icons-round text-base">
-                                                    {(tag.visibility === 'public' || tag.is_public) ? 'lock' : 'public'}
-                                                </span>
+                                                {(tag.visibility === 'public' || tag.is_public) ? (
+                                                    <Lock className="w-4 h-4" />
+                                                ) : (
+                                                    <Globe className="w-4 h-4" />
+                                                )}
                                                 {(tag.visibility === 'public' || tag.is_public) ? 'Make Private' : 'Make Public'}
                                             </button>
                                             <button
                                                 onClick={() => deleteTag(tag.id)}
                                                 className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800 flex items-center gap-2"
                                             >
-                                                <span className="material-icons-round text-base">delete</span>
+                                                <Trash2 className="w-4 h-4" />
                                                 Delete Tag
                                             </button>
                                         </div>
