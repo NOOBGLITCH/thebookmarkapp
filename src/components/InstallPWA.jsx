@@ -16,6 +16,23 @@ export default function InstallPWA() {
             console.log('beforeinstallprompt event fired')
             // Prevent the mini-infobar from appearing on mobile
             e.preventDefault()
+
+            // Check if dismissed recently
+            const dismissed = localStorage.getItem('pwa-install-dismissed')
+            if (dismissed) {
+                const dismissedTime = parseInt(dismissed)
+                const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24)
+                if (daysSinceDismissed < 7) {
+                    console.log('Install prompt dismissed recently')
+                    return
+                }
+            }
+
+            // Check if already installed (duplicate check, but safe)
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                return
+            }
+
             // Stash the event so it can be triggered later
             setDeferredPrompt(e)
             // Show the install prompt
@@ -24,10 +41,10 @@ export default function InstallPWA() {
 
         window.addEventListener('beforeinstallprompt', handler)
 
-        // Check if already installed
+        // Initial check for installed state
         if (window.matchMedia('(display-mode: standalone)').matches) {
             console.log('App is already installed')
-            setShowInstallPrompt(false)
+            // No need to set state to false as it defaults to false
         }
 
         return () => window.removeEventListener('beforeinstallprompt', handler)
@@ -57,18 +74,6 @@ export default function InstallPWA() {
         // Store dismissal in localStorage to not show again for a while
         localStorage.setItem('pwa-install-dismissed', Date.now().toString())
     }
-
-    // Don't show if recently dismissed
-    useEffect(() => {
-        const dismissed = localStorage.getItem('pwa-install-dismissed')
-        if (dismissed) {
-            const dismissedTime = parseInt(dismissed)
-            const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24)
-            if (daysSinceDismissed < 7) {
-                setShowInstallPrompt(false)
-            }
-        }
-    }, [])
 
     if (!showInstallPrompt) return null
 

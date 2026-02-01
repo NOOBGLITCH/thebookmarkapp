@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext({})
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContext)
     if (!context) {
@@ -84,11 +85,26 @@ export const AuthProvider = ({ children }) => {
         return { error }
     }
 
+    const signInWithGoogle = async () => {
+        try {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            })
+            return { data, error }
+        } catch (err) {
+            return { data: null, error: { message: err?.message || String(err) } }
+        }
+    }
+
     const value = {
         user,
         loading,
         signUp,
         signIn,
+        signInWithGoogle,
         signOut,
         getSupabaseUrl,
     }

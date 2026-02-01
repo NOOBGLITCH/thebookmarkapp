@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
@@ -11,6 +11,33 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
     const [menuOpenId, setMenuOpenId] = useState(null)
     const [shareCopiedId, setShareCopiedId] = useState(null)
     const menuRef = useRef(null)
+
+    const fetchTags = useCallback(async () => {
+        try {
+            const { data, error } = await supabase
+                .from('tags')
+                .select('id, name, visibility, is_public, bookmark_tags(count)')
+                .eq('user_id', user.id)
+                .order('name')
+
+            if (error) throw error
+
+            const tagsWithCounts = data.map(tag => ({
+                ...tag,
+                count: tag.bookmark_tags?.length || 0
+            }))
+
+            // Filter out tags with 0 bookmarks (orphaned tags)
+            const activeTags = tagsWithCounts.filter(tag => tag.count > 0)
+
+            console.log('🏷️ Tags fetched:', tagsWithCounts.length, 'Active:', activeTags.length)
+            setTags(activeTags)
+        } catch (error) {
+            console.error('Error fetching tags:', error)
+        } finally {
+            setLoading(false)
+        }
+    }, [user])
 
     useEffect(() => {
         if (user) {
@@ -37,34 +64,7 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
             document.removeEventListener('mousedown', handleClickOutside)
             window.removeEventListener('refreshTags', handleRefreshTags)
         }
-    }, [user])
-
-    const fetchTags = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('tags')
-                .select('id, name, visibility, is_public, bookmark_tags(count)')
-                .eq('user_id', user.id)
-                .order('name')
-
-            if (error) throw error
-
-            const tagsWithCounts = data.map(tag => ({
-                ...tag,
-                count: tag.bookmark_tags?.length || 0
-            }))
-
-            // Filter out tags with 0 bookmarks (orphaned tags)
-            const activeTags = tagsWithCounts.filter(tag => tag.count > 0)
-
-            console.log('🏷️ Tags fetched:', tagsWithCounts.length, 'Active:', activeTags.length)
-            setTags(activeTags)
-        } catch (error) {
-            console.error('Error fetching tags:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
+    }, [user, fetchTags])
 
     const handleCreateTag = async () => {
         if (!newTagName.trim()) return

@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from 'react'
 
 const BookmarkContext = createContext({})
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBookmarks = () => {
     const context = useContext(BookmarkContext)
     if (!context) {

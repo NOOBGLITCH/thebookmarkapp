@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { useBookmarks } from '../context/BookmarkContext'
@@ -18,16 +18,33 @@ export default function AddBookmarkModal() {
     const [aiLoading, setAiLoading] = useState(false)
     const [error, setError] = useState('')
 
+    // Define functions BEFORE using them in useEffect to avoid TDZ
+    const fetchFolders = useCallback(async () => {
+        if (!user) return
+        const { data } = await supabase.from('folders').select('id, name').eq('user_id', user.id).order('name')
+        if (data) setFolders(data)
+    }, [user])
+
+    const fetchBookmarkTags = useCallback(async (bookmarkId) => {
+        try {
+            const { data, error } = await supabase
+                .from('bookmark_tags')
+                .select('tags(name)')
+                .eq('bookmark_id', bookmarkId)
+
+            if (error) throw error
+            const tagNames = data.map(item => item.tags.name)
+            setTags(tagNames)
+        } catch (error) {
+            console.error('Error fetching tags:', error)
+        }
+    }, [])
+
     useEffect(() => {
         if (user) {
             fetchFolders()
         }
-    }, [user])
-
-    const fetchFolders = async () => {
-        const { data } = await supabase.from('folders').select('id, name').eq('user_id', user.id).order('name')
-        if (data) setFolders(data)
-    }
+    }, [user, fetchFolders])
 
     useEffect(() => {
         if (editingBookmark) {
@@ -44,22 +61,7 @@ export default function AddBookmarkModal() {
             setTags([])
             setSelectedFolderId(null)
         }
-    }, [editingBookmark])
-
-    const fetchBookmarkTags = async (bookmarkId) => {
-        try {
-            const { data, error } = await supabase
-                .from('bookmark_tags')
-                .select('tags(name)')
-                .eq('bookmark_id', bookmarkId)
-
-            if (error) throw error
-            const tagNames = data.map(item => item.tags.name)
-            setTags(tagNames)
-        } catch (error) {
-            console.error('Error fetching tags:', error)
-        }
-    }
+    }, [editingBookmark, fetchBookmarkTags])
 
     const handleAutoFillMetadata = async () => {
         if (!url) {

@@ -64,3 +64,22 @@ MIT License - feel free to use this for your own projects!
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNOOBGLITCH%2Fthebookmarkapp)
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/NOOBGLITCH/thebookmarkapp)
 
+
+## 🌐 Expose to Internet
+
+To share your local dev server with others, you can use:
+
+### Option 1: Cloudflared (Recommended)
+```bash
+cloudflared tunnel --url http://localhost:5173
+```
+
+### Option 2: Localtunnel (Quick)
+```bash
+npx localtunnel --port 5173
+```
+
+### Option 3: Ngrok (Requires Account)
+```bash
+npx ngrok http 5173
+```

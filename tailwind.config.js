@@ -1,3 +1,5 @@
+import flyonui from 'flyonui'
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
@@ -17,6 +19,7 @@ export default {
         },
     },
     plugins: [
-        require('flyonui')
+        flyonui
     ],
 }
+

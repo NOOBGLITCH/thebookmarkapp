@@ -83,7 +83,7 @@ function extractPathKeywords(url) {
             .filter(part => !STOP_WORDS.has(part))
 
         return pathParts.slice(0, 2) // Take first 2 meaningful path segments
-    } catch (error) {
+    } catch {
         return []
     }
 }
@@ -294,7 +294,7 @@ async function fetchURLContent(url) {
         if (response.ok) {
             return await response.text()
         }
-    } catch (error) {
+    } catch {
         console.log('Direct fetch failed (expected in localhost), trying proxies...')
     }
 
@@ -315,6 +315,7 @@ async function fetchURLContent(url) {
             }
             throw new Error('Response not OK')
         } catch (error) {
+            console.warn('Proxy fetch failed:', error)
             throw error
         }
     })
@@ -322,7 +323,7 @@ async function fetchURLContent(url) {
     // Race all proxies and return first success
     try {
         return await Promise.any(proxyPromises)
-    } catch (error) {
+    } catch {
         throw new Error('Unable to fetch URL. All proxies failed or timed out. Please enter details manually.')
     }
 }

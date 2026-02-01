@@ -1,12 +1,12 @@
 import { useAuth } from '../context/AuthContext'
 import { useBookmarks } from '../context/BookmarkContext'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import SearchBar from '../components/SearchBar'
 
 export default function FavoritesView() {
     const { user } = useAuth()
-    const { openEditModal, openAddModal, refreshTrigger } = useBookmarks()
+    const { openEditModal, refreshTrigger } = useBookmarks()
     const [bookmarks, setBookmarks] = useState([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
@@ -15,30 +15,15 @@ export default function FavoritesView() {
         return saved ? JSON.parse(saved) : []
     })
 
-    useEffect(() => {
-        if (user) {
-            fetchBookmarks()
-        }
-    }, [user, refreshTrigger])
-
-    // Listen for favorites changes from other tabs
-    useEffect(() => {
-        const handleStorageChange = (e) => {
-            if (e.key === 'bookmarkFavorites') {
-                setFavorites(e.newValue ? JSON.parse(e.newValue) : [])
-            }
-        }
-        window.addEventListener('storage', handleStorageChange)
-        return () => window.removeEventListener('storage', handleStorageChange)
-    }, [])
-
-    const fetchBookmarks = async () => {
+    const fetchBookmarks = useCallback(async () => {
         try {
             // Only fetch if we have favorites
             if (favorites.length === 0) {
                 setLoading(false)
                 return
             }
+
+            if (!user) return
 
             const { data, error } = await supabase
                 .from('bookmarks')
@@ -69,7 +54,24 @@ export default function FavoritesView() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [user, favorites])
+
+    useEffect(() => {
+        if (user) {
+            fetchBookmarks()
+        }
+    }, [user, refreshTrigger, fetchBookmarks])
+
+    // Listen for favorites changes from other tabs
+    useEffect(() => {
+        const handleStorageChange = (e) => {
+            if (e.key === 'bookmarkFavorites') {
+                setFavorites(e.newValue ? JSON.parse(e.newValue) : [])
+            }
+        }
+        window.addEventListener('storage', handleStorageChange)
+        return () => window.removeEventListener('storage', handleStorageChange)
+    }, [fetchBookmarks])
 
     const deleteBookmark = async (id) => {
         if (!confirm('Are you sure you want to delete this bookmark?')) return

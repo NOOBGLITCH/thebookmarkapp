@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useLocation, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
@@ -42,16 +42,7 @@ export default function SharedView() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    useEffect(() => {
-        if (!token) {
-            setError('Invalid link')
-            setLoading(false)
-            return
-        }
-        fetchShared()
-    }, [token, type])
-
-    const fetchShared = async () => {
+    const fetchShared = useCallback(async () => {
         try {
             setLoading(true)
             setError(null)
@@ -82,7 +73,16 @@ export default function SharedView() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [token, type])
+
+    useEffect(() => {
+        if (!token) {
+            setError('Invalid link')
+            setLoading(false)
+            return
+        }
+        fetchShared()
+    }, [token, type, fetchShared])
 
     if (loading) {
         return (

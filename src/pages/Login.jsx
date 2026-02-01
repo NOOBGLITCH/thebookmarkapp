@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
@@ -7,9 +7,15 @@ export default function Login() {
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
-    const { signIn } = useAuth()
+    const { signIn, signInWithGoogle, user } = useAuth()
     const navigate = useNavigate()
     const isFetchError = error && (error === 'FETCH_FAILED' || error.includes('fetch') || error.includes('Network'))
+
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard')
+        }
+    }, [user, navigate])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -48,6 +54,40 @@ export default function Login() {
                         )}
                     </div>
                 )}
+
+                <button
+                    onClick={() => signInWithGoogle()}
+                    className="w-full py-3 mb-4 bg-white text-gray-900 font-semibold rounded flex items-center justify-center gap-2 hover:bg-gray-100 transition"
+                >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <path
+                            fill="#EA4335"
+                            d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.065 0 12 0 7.37 0 3.376 2.67 1.675 6.505l3.591 3.26z"
+                        />
+                        <path
+                            fill="#34A853"
+                            d="M16.04 18.013c-1.09.703-2.474 1.078-4.04 1.078a7.077 7.077 0 0 1-6.723-4.823l-3.607 2.87C4.269 21.045 7.854 24 12 24c4.936 0 9.023-2.607 11.108-6.505l-3.416-2.906c-.848 1.417-2.158 2.637-3.652 3.424z"
+                        />
+                        <path
+                            fill="#4A90E2"
+                            d="M19.834 21.495A12.029 12.029 0 0 0 24 12c0-.66-.057-1.325-.17-1.996H12v3.992h6.805a5.957 5.957 0 0 1-2.288 3.398l3.317 4.101z"
+                        />
+                        <path
+                            fill="#FBBC05"
+                            d="M5.277 14.268A7.12 7.12 0 0 1 4.909 12c0-.782.125-1.533.357-2.235L1.675 6.505A11.986 11.986 0 0 0 0 12c0 1.92.445 3.73 1.237 5.388l4.04-3.12z"
+                        />
+                    </svg>
+                    Sign in with Google
+                </button>
+
+                <div className="relative mb-6">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-700"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-surface text-secondaryText">Or continue with</span>
+                    </div>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>

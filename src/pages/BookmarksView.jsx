@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext'
 import { useBookmarks } from '../context/BookmarkContext'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import SearchBar from '../components/SearchBar'
 
@@ -18,11 +18,47 @@ export default function BookmarksView() {
         return saved ? JSON.parse(saved) : []
     })
 
+    const fetchBookmarks = useCallback(async () => {
+        try {
+            if (!user) return
+
+            const { data, error } = await supabase
+                .from('bookmarks')
+                .select(`
+          id,
+          url,
+          title,
+          description,
+          created_at,
+          folder_id,
+          bookmark_tags(
+            tags(name)
+          )
+        `)
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+
+            if (error) throw error
+
+            // Transform data to include tags array
+            const bookmarksWithTags = data.map(bookmark => ({
+                ...bookmark,
+                tags: bookmark.bookmark_tags?.map(bt => bt.tags.name) || []
+            }))
+
+            setBookmarks(bookmarksWithTags)
+        } catch (error) {
+            console.error('Error fetching bookmarks:', error)
+        } finally {
+            setLoading(false)
+        }
+    }, [user])
+
     useEffect(() => {
         if (user) {
             fetchBookmarks()
         }
-    }, [user, refreshTrigger])
+    }, [user, refreshTrigger, fetchBookmarks])
 
     // Listen for tag filter events from sidebar
     useEffect(() => {
@@ -76,44 +112,8 @@ export default function BookmarksView() {
         })
     }
 
-    const fetchBookmarks = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('bookmarks')
-                .select(`
-          id,
-          url,
-          title,
-          description,
-          created_at,
-          folder_id,
-          bookmark_tags(
-            tags(name)
-          )
-        `)
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false })
-
-            if (error) throw error
-
-            // Transform data to include tags array
-            const bookmarksWithTags = data.map(bookmark => ({
-                ...bookmark,
-                tags: bookmark.bookmark_tags?.map(bt => bt.tags.name) || []
-            }))
-
-            setBookmarks(bookmarksWithTags)
-        } catch (error) {
-            console.error('Error fetching bookmarks:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const deleteBookmark = async (id) => {
         // Optimistic UI update immediately
-
-
         console.log('🗑️ Starting delete for bookmark ID:', id)
         console.log('👤 Current user:', user?.id)
 
@@ -152,9 +152,6 @@ export default function BookmarksView() {
 
     const handleBulkDelete = async () => {
         if (selectedBookmarks.length === 0) return
-
-        // No confirm dialog for bulk delete either, based on user feedback
-
 
         try {
             for (const id of selectedBookmarks) {
