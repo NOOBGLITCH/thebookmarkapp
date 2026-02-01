@@ -54,18 +54,41 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
         }
         window.addEventListener('refreshTags', handleRefreshTags)
 
-        // Close menu/input when clicking outside
+        return () => {
+            window.removeEventListener('refreshTags', handleRefreshTags)
+        }
+    }, [user, fetchTags])
+
+    // Optimistic update handler
+    useEffect(() => {
+        const handleBookmarkDeleted = (event) => {
+            const { tags: deletedTags } = event.detail
+            if (!deletedTags || deletedTags.length === 0) return
+
+            setTags(prevTags => {
+                return prevTags.map(tag => {
+                    if (deletedTags.includes(tag.name)) {
+                        return { ...tag, count: Math.max(0, tag.count - 1) }
+                    }
+                    return tag
+                }).filter(tag => tag.count > 0) // Remove empty tags if desired, or keep them
+            })
+        }
+
+        window.addEventListener('bookmarkDeleted', handleBookmarkDeleted)
+        return () => window.removeEventListener('bookmarkDeleted', handleBookmarkDeleted)
+    }, [])
+
+    // Close menu/input when clicking outside
+    useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
                 setMenuOpenId(null)
             }
         }
         document.addEventListener('mousedown', handleClickOutside)
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside)
-            window.removeEventListener('refreshTags', handleRefreshTags)
-        }
-    }, [user, fetchTags])
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     const handleCreateTag = async () => {
         if (!newTagName.trim()) return

@@ -139,7 +139,18 @@ export default function BookmarksView() {
 
             if (error) throw error
 
-            // Trigger tag refresh AFTER successful delete to ensure counts are accurate
+            // Trigger global event for optimistic updates in sidebar
+            const bookmarkToDelete = bookmarks.find(b => b.id === id)
+            if (bookmarkToDelete) {
+                window.dispatchEvent(new CustomEvent('bookmarkDeleted', {
+                    detail: {
+                        id,
+                        tags: bookmarkToDelete.tags
+                    }
+                }))
+            }
+
+            // Also trigger standard refresh as fallback
             window.dispatchEvent(new CustomEvent('refreshTags'))
 
         } catch (error) {
