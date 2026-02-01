@@ -3,8 +3,8 @@
   <h1>FlowMark</h1>
   <p><strong>Organize Your Bookmarks Like Never Before</strong></p>
   
-  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNOOBGLITCH%2Fthebookmarkapp)
-  [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/NOOBGLITCH/thebookmarkapp)
+  [![Deploy with Vercel](https://img.shields.io/badge/Deploy_with-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNOOBGLITCH%2Fthebookmarkapp)
+  [![Deploy to Netlify](https://img.shields.io/badge/Deploy_with-Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://app.netlify.com/start/deploy?repository=https://github.com/NOOBGLITCH/thebookmarkapp)
 </div>
 
 <br />
