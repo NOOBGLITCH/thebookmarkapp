@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Landing() {
     const { user } = useAuth()
     const navigate = useNavigate()
+    const [scrolled, setScrolled] = useState(false)
 
     useEffect(() => {
         if (user) {
@@ -12,119 +13,243 @@ export default function Landing() {
         }
     }, [user, navigate])
 
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 50)
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
     return (
-        <div className="min-h-screen bg-background text-primaryText">
-            {/* Header */}
-            <header className="border-b border-gray-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                            </svg>
+        <div className="min-h-screen bg-background text-primaryText font-sans selection:bg-accent selection:text-white overflow-x-hidden">
+
+            {/* Navbar */}
+            <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-surface/95 backdrop-blur-md shadow-lg border-b border-gray-800 py-3' : 'bg-transparent py-5'}`}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                    <div className="flex items-center gap-2 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                        <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20 group-hover:scale-110 transition-transform">
+                            <span className="material-icons-round text-white">bookmarks</span>
                         </div>
-                        <h1 className="text-2xl font-bold text-accent">FlowMark</h1>
+                        <span className="text-2xl font-bold tracking-tight">FlowMark</span>
                     </div>
-                    <Link
-                        to="/login"
-                        className="px-4 py-2 text-primaryText hover:text-accent transition"
-                    >
-                        Sign In
-                    </Link>
+                    <div className="flex items-center gap-6">
+                        <a href="#features" className="hidden md:block text-secondaryText hover:text-white transition font-medium">Features</a>
+                        <a href="#how-it-works" className="hidden md:block text-secondaryText hover:text-white transition font-medium">How it Works</a>
+                        <Link to="/login" className="px-5 py-2.5 rounded-lg font-semibold hover:bg-surface transition border border-transparent hover:border-gray-700">Sign In</Link>
+                        <Link to="/signup" className="px-6 py-2.5 bg-accent hover:bg-accent/90 text-white font-semibold rounded-lg shadow-lg shadow-accent/20 transition hover:-translate-y-0.5">Get Started</Link>
+                    </div>
                 </div>
-            </header>
+            </nav>
 
             {/* Hero Section */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-                <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-accent to-green-400 bg-clip-text text-transparent">
-                    Organize Your Bookmarks
-                    <br />
-                    Like Never Before
-                </h2>
-                <p className="text-xl text-secondaryText mb-8 max-w-2xl mx-auto">
-                    FlowMark helps you save, organize, and rediscover your favorite links with smart metadata extraction and intelligent tagging.
-                </p>
-                <div className="flex gap-4 justify-center">
-                    <Link
-                        to="/signup"
-                        className="px-8 py-4 bg-accent hover:bg-accent/90 text-white font-semibold rounded-lg transition text-lg"
-                    >
-                        Get Started Free
-                    </Link>
-                    <a
-                        href="#features"
-                        className="px-8 py-4 bg-surface hover:bg-gray-800 text-primaryText font-semibold rounded-lg transition text-lg"
-                    >
-                        Learn More
-                    </a>
-                </div>
-            </section>
+            <section className="pt-32 pb-20 md:pt-48 md:pb-32 relative overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-accent/10 rounded-full blur-[120px] -z-10"></div>
+                <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[100px] -z-10 animate-pulse"></div>
 
-            {/* Features Section */}
-            <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                <h3 className="text-3xl font-bold text-center mb-12">Why FlowMark?</h3>
-                <div className="grid md:grid-cols-3 gap-8">
-                    {/* Feature 1 */}
-                    <div className="bg-surface p-8 rounded-lg hover:ring-2 hover:ring-accent transition">
-                        <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                            </svg>
-                        </div>
-                        <h4 className="text-xl font-semibold mb-2">Smart Auto-Tagging</h4>
-                        <p className="text-secondaryText">
-                            Automatically generate tags and descriptions using metadata extraction from web pages.
-                        </p>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-gray-700 mb-8 animate-fade-in-up">
+                        <span className="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                        <span className="text-sm font-medium text-secondaryText">New: Ultra-fast Metadata Extraction ⚡</span>
                     </div>
 
-                    {/* Feature 2 */}
-                    <div className="bg-surface p-8 rounded-lg hover:ring-2 hover:ring-accent transition">
-                        <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                            </svg>
-                        </div>
-                        <h4 className="text-xl font-semibold mb-2">Smart Organization</h4>
-                        <p className="text-secondaryText">
-                            Organize bookmarks with folders and tags. Find anything instantly with powerful search.
-                        </p>
-                    </div>
+                    <h1 className="text-5xl md:text-7xl font-extrabold mb-8 tracking-tight leading-tight">
+                        Your Second Brain for <br />
+                        <span className="bg-gradient-to-r from-accent via-green-400 to-blue-500 bg-clip-text text-transparent animate-gradient-x">Digital Chaos</span>
+                    </h1>
 
-                    {/* Feature 3 */}
-                    <div className="bg-surface p-8 rounded-lg hover:ring-2 hover:ring-accent transition">
-                        <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <h4 className="text-xl font-semibold mb-2">Works Offline</h4>
-                        <p className="text-secondaryText">
-                            Progressive Web App with offline support. Install on any device and access anywhere.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-                <div className="bg-surface rounded-2xl p-12">
-                    <h3 className="text-3xl font-bold mb-4">Ready to get organized?</h3>
-                    <p className="text-secondaryText mb-8 text-lg">
-                        Join thousands of users managing their bookmarks smarter.
+                    <p className="text-xl md:text-2xl text-secondaryText mb-12 max-w-3xl mx-auto leading-relaxed">
+                        Stop losing links in endless tabs. FlowMark uses
+                        <span className="text-white font-semibold"> smart AI</span> to auto-tag, organize,
+                        and retrieve your bookmarks instantly.
                     </p>
-                    <Link
-                        to="/signup"
-                        className="inline-block px-8 py-4 bg-accent hover:bg-accent/90 text-white font-semibold rounded-lg transition text-lg"
-                    >
-                        Start Free Today
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+                        <Link to="/signup" className="w-full sm:w-auto px-8 py-4 bg-accent hover:bg-accent/90 text-white font-bold rounded-xl shadow-xl shadow-accent/30 transition hover:scale-105 flex items-center justify-center gap-3">
+                            <i className="fa-solid fa-rocket"></i>
+                            Start Organizing Free
+                        </Link>
+                        <a href="#demo" className="w-full sm:w-auto px-8 py-4 bg-surface border border-gray-700 hover:bg-gray-800 text-white font-bold rounded-xl transition hover:scale-105 flex items-center justify-center gap-3">
+                            <i className="fa-regular fa-circle-play"></i>
+                            Watch Demo
+                        </a>
+                    </div>
+
+                    {/* Stats / Trust */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto border-t border-gray-800 pt-12 opacity-80">
+                        <div>
+                            <div className="text-3xl font-bold text-white mb-1">10k+</div>
+                            <div className="text-sm text-secondaryText uppercase tracking-wider">Links Saved</div>
+                        </div>
+                        <div>
+                            <div className="text-3xl font-bold text-white mb-1">0.1s</div>
+                            <div className="text-sm text-secondaryText uppercase tracking-wider">Fetch Speed</div>
+                        </div>
+                        <div>
+                            <div className="text-3xl font-bold text-white mb-1">100%</div>
+                            <div className="text-sm text-secondaryText uppercase tracking-wider">Privacy</div>
+                        </div>
+                        <div>
+                            <div className="text-3xl font-bold text-white mb-1">Offline</div>
+                            <div className="text-sm text-secondaryText uppercase tracking-wider">Support</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Features Grid */}
+            <section id="features" className="py-24 bg-surface/30 relative">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-20">
+                        <h2 className="text-4xl font-bold mb-4">Everything You Need</h2>
+                        <p className="text-secondaryText text-xl max-w-2xl mx-auto">
+                            Powerful features wrapped in a beautiful, minimalist design.
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {/* Feature 1 */}
+                        <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
+                            <div className="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i className="fa-solid fa-bolt text-2xl text-blue-500"></i>
+                            </div>
+                            <h3 className="text-xl font-bold mb-3">Superfast Extraction</h3>
+                            <p className="text-secondaryText leading-relaxed">
+                                Paste a link and watch magic happen. We extract titles, descriptions, and high-res images in milliseconds.
+                            </p>
+                        </div>
+
+                        {/* Feature 2 */}
+                        <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
+                            <div className="w-14 h-14 bg-green-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i className="fa-solid fa-tags text-2xl text-accent"></i>
+                            </div>
+                            <h3 className="text-xl font-bold mb-3">Smart Auto-Tagging</h3>
+                            <p className="text-secondaryText leading-relaxed">
+                                No more manual sorting. Our logic automatically categorizes links like 'Dev', 'News', or 'Design' for you.
+                            </p>
+                        </div>
+
+                        {/* Feature 3 */}
+                        <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
+                            <div className="w-14 h-14 bg-purple-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i className="fa-solid fa-shield-halved text-2xl text-purple-500"></i>
+                            </div>
+                            <h3 className="text-xl font-bold mb-3">Privacy First</h3>
+                            <p className="text-secondaryText leading-relaxed">
+                                Your data lives in your secure database. No tracking pixels, no ad targeting, just your personal library.
+                            </p>
+                        </div>
+
+                        {/* Feature 4 */}
+                        <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
+                            <div className="w-14 h-14 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i className="fa-solid fa-mobile-screen text-2xl text-yellow-500"></i>
+                            </div>
+                            <h3 className="text-xl font-bold mb-3">PWA & Offline Ready</h3>
+                            <p className="text-secondaryText leading-relaxed">
+                                Install as a native app on iOS, Android, or Desktop. Access your library even when offline.
+                            </p>
+                        </div>
+
+                        {/* Feature 5 */}
+                        <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
+                            <div className="w-14 h-14 bg-pink-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i className="fa-solid fa-share-nodes text-2xl text-pink-500"></i>
+                            </div>
+                            <h3 className="text-xl font-bold mb-3">Share & Collaborate</h3>
+                            <p className="text-secondaryText leading-relaxed">
+                                Create public links for folders or tags. Share your curated 'Reading List' or 'Dev Tools' with one click.
+                            </p>
+                        </div>
+
+                        {/* Feature 6 */}
+                        <div className="bg-surface p-8 rounded-2xl border border-gray-800 hover:border-accent/50 hover:bg-gray-800/50 transition group">
+                            <div className="w-14 h-14 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <i className="fa-solid fa-magnifying-glass text-2xl text-cyan-500"></i>
+                            </div>
+                            <h3 className="text-xl font-bold mb-3">Instant Search</h3>
+                            <p className="text-secondaryText leading-relaxed">
+                                Fuzzy search across titles, URLs, and tags. Find that one article you saved years ago in &lt; 0.1s.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* How it Works Section */}
+            <section id="how-it-works" className="py-24">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-20">
+                        <h2 className="text-4xl font-bold mb-4">Effortless Workflow</h2>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-12 relative">
+                        {/* Connecting Line (Desktop) */}
+                        <div className="hidden md:block absolute top-12 left-0 w-full h-1 bg-gradient-to-r from-gray-800 via-accent to-gray-800 -z-10 opacity-30"></div>
+
+                        {/* Step 1 */}
+                        <div className="text-center">
+                            <div className="w-24 h-24 bg-surface border-4 border-background rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl relative z-10">
+                                <span className="text-4xl font-bold text-accent">1</span>
+                            </div>
+                            <h3 className="text-xl font-bold mb-4">Paste Link</h3>
+                            <p className="text-secondaryText">Just drop a URL instantly. We handle the rest.</p>
+                        </div>
+
+                        {/* Step 2 */}
+                        <div className="text-center">
+                            <div className="w-24 h-24 bg-surface border-4 border-background rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl relative z-10">
+                                <span className="text-4xl font-bold text-blue-500">2</span>
+                            </div>
+                            <h3 className="text-xl font-bold mb-4">Auto-Process</h3>
+                            <p className="text-secondaryText">Our engine fetches metadata and tags it intelligently.</p>
+                        </div>
+
+                        {/* Step 3 */}
+                        <div className="text-center">
+                            <div className="w-24 h-24 bg-surface border-4 border-background rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl relative z-10">
+                                <span className="text-4xl font-bold text-green-500">3</span>
+                            </div>
+                            <h3 className="text-xl font-bold mb-4">Forever Yours</h3>
+                            <p className="text-secondaryText">Stored securely. Searchable instantly. Available offline.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA Footer */}
+            <section className="py-24 bg-gradient-to-t from-accent/10 to-transparent">
+                <div className="max-w-4xl mx-auto px-4 text-center">
+                    <h2 className="text-4xl md:text-5xl font-bold mb-8">Ready to tame the web?</h2>
+                    <p className="text-xl text-secondaryText mb-10">
+                        Join the future of bookmarking. Open source, fast, and privacy-focused.
+                    </p>
+                    <Link to="/signup" className="px-10 py-5 bg-white text-black font-bold rounded-xl hover:bg-gray-100 transition shadow-xl text-lg inline-flex items-center gap-2">
+                        Get Started Now
+                        <i className="fa-solid fa-arrow-right"></i>
                     </Link>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="border-t border-gray-800 py-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-secondaryText">
-                    <p>&copy; 2026 FlowMark. Built with ❤️ for bookmark lovers.</p>
+            <footer className="border-t border-gray-800 py-12 bg-surface/30">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="flex items-center gap-2">
+                        <span className="material-icons-round text-accent">bookmarks</span>
+                        <span className="font-bold text-xl">FlowMark</span>
+                    </div>
+
+                    <div className="flex gap-8 text-secondaryText text-sm">
+                        <a href="#" className="hover:text-white transition">Privacy</a>
+                        <a href="#" className="hover:text-white transition">Terms</a>
+                        <a href="https://github.com/NOOBGLITCH/thebookmarkapp" target="_blank" rel="noreferrer" className="hover:text-white transition flex items-center gap-2">
+                            <i className="fa-brands fa-github"></i>
+                            GitHub
+                        </a>
+                    </div>
+
+                    <div className="text-secondaryText text-sm">
+                        &copy; {new Date().getFullYear()} FlowMark
+                    </div>
                 </div>
             </footer>
         </div>

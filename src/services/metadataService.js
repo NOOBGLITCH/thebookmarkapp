@@ -342,6 +342,16 @@ export async function extractMetadata(url) {
         // Parse metadata
         const metadata = parseHTMLMetadata(html, url)
 
+        // Upload image to ImgBB if available
+        let processedImage = metadata.ogImage
+        if (processedImage) {
+            try {
+                processedImage = await uploadToImgBB(processedImage)
+            } catch (err) {
+                console.warn('ImgBB upload failed, falling back to original URL:', err)
+            }
+        }
+
         // Generate suggested tags
         const suggestedTags = generateTagsFromText(
             metadata.title,
@@ -353,7 +363,7 @@ export async function extractMetadata(url) {
             title: metadata.title,
             description: metadata.description,
             favicon: metadata.favicon,
-            screenshot: metadata.ogImage, // Use OG image as screenshot
+            screenshot: processedImage, // Use ImgBB image if matched
             suggestedTags
         }
     } catch (error) {
@@ -390,4 +400,37 @@ export function extractTagsFromFolderPath(folderPath) {
         .map(folder => folder.trim().toLowerCase())
         .filter(folder => folder.length > 0 && folder !== 'bookmarks')
         .slice(0, 3) // Max 3 folder-based tags
+}
+
+/**
+ * Upload image URL to ImgBB
+ */
+async function uploadToImgBB(imageUrl) {
+    const apiKey = import.meta.env.VITE_IMGBB_API_KEY
+    if (!apiKey) return imageUrl
+
+    try {
+        const formData = new FormData()
+        formData.append('image', imageUrl)
+
+        // 5 second timeout for upload
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+            method: 'POST',
+            body: formData,
+            signal: controller.signal
+        })
+
+        clearTimeout(timeoutId)
+
+        if (!response.ok) throw new Error('ImgBB Upload Failed')
+
+        const data = await response.json()
+        return data.data.url
+    } catch (error) {
+        console.warn('ImgBB upload error:', error)
+        return imageUrl // Fallback to original
+    }
 }
