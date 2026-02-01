@@ -299,7 +299,7 @@ export default function Settings() {
                             onClick={async () => {
                                 try {
                                     await signOut()
-                                    navigate('/')
+                                    window.location.href = '/' // Force full reload
                                 } catch {
                                     setError('Failed to sign out')
                                 }

@@ -166,56 +166,67 @@ export default function AddBookmarkModal() {
                 bookmarkId = data.id
             }
 
-            // Handle tags with optimized batch operations
-            if (tags.length > 0) {
-                // Delete existing tags for this bookmark
-                await supabase
-                    .from('bookmark_tags')
-                    .delete()
-                    .eq('bookmark_id', bookmarkId)
+            // ----------------------------------------------------
+            // OPTIMIZATION: Handle tags in background (Fire & Forget)
+            // ----------------------------------------------------
+            const handleTagsInBackground = async (bmId) => {
+                try {
+                    if (tags.length > 0) {
+                        // Delete existing tags for this bookmark
+                        await supabase
+                            .from('bookmark_tags')
+                            .delete()
+                            .eq('bookmark_id', bmId)
 
-                // Get or create all tags in parallel
-                const tagPromises = tags.map(async (tagName) => {
-                    // Try to get existing tag
-                    let { data: existingTag } = await supabase
-                        .from('tags')
-                        .select('id')
-                        .eq('name', tagName)
-                        .eq('user_id', user.id)
-                        .maybeSingle()
+                        // Get or create all tags in parallel
+                        const tagPromises = tags.map(async (tagName) => {
+                            // Try to get existing tag
+                            let { data: existingTag } = await supabase
+                                .from('tags')
+                                .select('id')
+                                .eq('name', tagName)
+                                .eq('user_id', user.id)
+                                .maybeSingle()
 
-                    if (existingTag) {
-                        return existingTag.id
-                    } else {
-                        // Create new tag
-                        const { data: newTag, error: tagError } = await supabase
-                            .from('tags')
-                            .insert({ name: tagName, user_id: user.id })
-                            .select('id')
-                            .single()
+                            if (existingTag) {
+                                return existingTag.id
+                            } else {
+                                // Create new tag
+                                const { data: newTag, error: tagError } = await supabase
+                                    .from('tags')
+                                    .insert({ name: tagName, user_id: user.id })
+                                    .select('id')
+                                    .single()
 
-                        if (tagError) throw tagError
-                        return newTag.id
+                                if (tagError) throw tagError
+                                return newTag.id
+                            }
+                        })
+
+                        const tagIds = await Promise.all(tagPromises)
+
+                        // Batch insert bookmark_tag relationships
+                        const bookmarkTagInserts = tagIds.map(tagId => ({
+                            bookmark_id: bmId,
+                            tag_id: tagId,
+                        }))
+
+                        await supabase
+                            .from('bookmark_tags')
+                            .insert(bookmarkTagInserts)
                     }
-                })
-
-                const tagIds = await Promise.all(tagPromises)
-
-                // Batch insert bookmark_tag relationships
-                const bookmarkTagInserts = tagIds.map(tagId => ({
-                    bookmark_id: bookmarkId,
-                    tag_id: tagId,
-                }))
-
-                await supabase
-                    .from('bookmark_tags')
-                    .insert(bookmarkTagInserts)
+                    // Trigger tag refresh after background work
+                    window.dispatchEvent(new CustomEvent('refreshTags'))
+                } catch (err) {
+                    console.error('Background tag processing failed:', err)
+                }
             }
 
-            // Trigger refresh instead of page reload
+            // Start background work
+            handleTagsInBackground(bookmarkId)
+
+            // Trigger refresh immediately (shows bookmark without tags first)
             triggerRefresh()
-            // Trigger tag refresh immediately
-            window.dispatchEvent(new CustomEvent('refreshTags'))
 
             // Reset form fields only if it was a new bookmark (not editing)
             if (!editingBookmark) {

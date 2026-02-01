@@ -41,7 +41,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
     const handleLogout = async () => {
         await signOut()
-        navigate('/')
+        window.location.href = '/' // Force full reload to avoid protected route redirection race condition
     }
 
     const handleSelectTag = (tagName) => {
