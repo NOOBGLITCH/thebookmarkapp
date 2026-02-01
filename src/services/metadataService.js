@@ -262,7 +262,7 @@ function parseHTMLMetadata(html, url) {
  * Fetch URL content with multiple CORS proxy fallbacks and timeout
  */
 async function fetchURLContent(url) {
-    const TIMEOUT = 8000 // 8 second timeout
+    const TIMEOUT = 4000 // Reduced to 4 second timeout for faster feedback
 
     // Helper to add timeout to fetch
     const fetchWithTimeout = (url, options, timeout) => {
@@ -289,7 +289,7 @@ async function fetchURLContent(url) {
             headers: {
                 'Accept': 'text/html,application/xhtml+xml'
             }
-        }, 3000) // Quick 3s timeout for direct fetch
+        }, 1500) // Reduced to 1.5s timeout for direct fetch
 
         if (response.ok) {
             return await response.text()

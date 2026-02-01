@@ -1,85 +1,85 @@
-# FlowMark - Smart Bookmark Manager
+<div align="center">
+  <img src="./public/logo.png" alt="FlowMark Logo" width="120" />
+  <h1>FlowMark</h1>
+  <p><strong>Organize Your Bookmarks Like Never Before</strong></p>
+  
+  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNOOBGLITCH%2Fthebookmarkapp)
+</div>
 
-FlowMark is a modern, privacy-first bookmark manager that helps you organize your web links with intelligent tagging and metadata extraction.
+<br />
+
+**FlowMark** is a modern, privacy-first bookmark manager designed to help you save, organize, and rediscover your favorite links. With intelligent auto-tagging and a beautiful interface, it transforms your chaotic browser bookmarks into a curated knowledge base.
 
 ## 🚀 Features
 
-- **Smart Metadata Extraction**: Automatically fetches titles, descriptions, and high-quality tags from any URL.
-- **Privacy-First**: No data is sent to external AI APIs. All processing happens via standard web protocols.
-- **Auto-Tagging**: Uses rule-based logic and domain mapping to generate 5-7 relevant tags per bookmark.
-- **Live Screenshots**: Automatic screenshot generation for every bookmark using WordPress mshots.
-- **Real-Time Sync**: Instant updates across devices without page reloads.
-- **Import/Export**: Easily migrate your bookmarks from Chrome, Firefox, or Edge.
-- **Public Sharing**: Share curated collections of bookmarks via public links.
-- **Folder Organization**: Nested folders for deep organization.
-- **Responsive Design**: Beautiful UI that works on desktop and mobile.
+- **⚡ Instant Metadata**: Automatically fetches titles, descriptions, and previews using a custom extraction engine.
+- **🏷️ Smart Auto-Tagging**: Uses rule-based logic to automatically categorize links (e.g., "Dev", "News", "Design") without sending data to external AI APIs.
+- **📷 Live Screenshots**: Generates visual previews of your bookmarks automatically.
+- **🔒 Privacy-Focused**: Your data lives in your Supabase database. No tracking, no external data selling.
+- **📂 Deep Organization**: Create nested folders and use multiple tags for flexible organization.
+- **🔍 Full-Text Search**: Find any bookmark instantly by title, URL, or tag.
+- **📱 PWA Support**: Install as an app on your phone or desktop for offline access.
+- **🤝 Sharing**: Create public links to share curated folders or lists with friends.
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, Vite, TailwindCSS
-- **Backend**: Supabase (PostgreSQL, Auth, Realtime)
-- **Icons**: Heroicons
-- **Metadata**: Custom extraction engine (No AI dependencies)
+Built with modern, high-performance technologies:
 
-## ⚡ Performance
+- **Frontend**: [React](https://react.dev/), [Vite](https://vitejs.dev/)
+- **Styling**: [TailwindCSS](https://tailwindcss.com/)
+- **Backend & Auth**: [Supabase](https://supabase.com/) (PostgreSQL)
+- **State Management**: React Context API
+- **Deployment**: [Vercel](https://vercel.com/)
 
-- **Fast Extraction**: Parallel proxy racing fetches metadata in 3-8 seconds.
-- **Optimized Saving**: Batch operations allow saving bookmarks with multiple tags in <1 second.
-- **Reliable**: Multiple CORS fallbacks ensure metadata is always extracted.
+---
 
-## 📦 Installation
+## 📦 Getting Started
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/flowmark.git
-   ```
+### Prerequisites
+- Node.js 18+
+- A Supabase account (Free tier is sufficient)
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+### Installation
 
-3. Set up environment variables:
-   Create a `.env` file with your Supabase credentials:
-   ```env
-   VITE_SUPABASE_URL=your_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_key
-   ```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/NOOBGLITCH/thebookmarkapp.git
+    cd thebookmarkapp
+    ```
 
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-## 🔒 Privacy & Security
+3.  **Environment Setup:**
+    Create a `.env` file in the root directory:
+    ```env
+    VITE_SUPABASE_URL=https://your-project.supabase.co
+    VITE_SUPABASE_ANON_KEY=your-anon-key
+    ```
 
-FlowMark is designed to be privacy-respecting. Unlike other smart bookmark managers that send your data to LLMs (Large Language Models), FlowMark uses deterministic rule-based systems to extract value from your bookmarks. Your data stays between you and your Supabase database.
+4.  **Run Development Server:**
+    ```bash
+    npm run dev
+    ```
+    Open `http://localhost:5173` to see the app.
 
-## 📝 License
+---
 
-MIT License - feel free to use this for your own projects!
+## 🚀 Deployment
 
-## 🚀 Deploy
+The easiest way to deploy is with **Vercel**.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNOOBGLITCH%2Fthebookmarkapp)
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/NOOBGLITCH/thebookmarkapp)
+1.  Push your code to GitHub.
+2.  Import the project into Vercel.
+3.  Add your Environment Variables in the Vercel Dashboard.
+4.  **Important**: Update your **Supabase Auth Redirect URLs** and **Google Cloud Console** authorized origins to match your new Vercel domain.
 
+---
 
-## 🌐 Expose to Internet
+## 📜 License
 
-To share your local dev server with others, you can use:
-
-### Option 1: Cloudflared (Recommended)
-```bash
-cloudflared tunnel --url http://localhost:5173
-```
-
-### Option 2: Localtunnel (Quick)
-```bash
-npx localtunnel --port 5173
-```
-
-### Option 3: Ngrok (Requires Account)
-```bash
-npx ngrok http 5173
-```
+MIT License &copy; 2026 FlowMark.
