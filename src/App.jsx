@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { BookmarkProvider } from './context/BookmarkContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import RedirectIfAuthenticated from './components/RedirectIfAuthenticated'
 import DashboardLayout from './layouts/DashboardLayout'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
@@ -19,9 +20,9 @@ function App() {
       <AuthProvider>
         <BookmarkProvider>
           <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/" element={<RedirectIfAuthenticated><Landing /></RedirectIfAuthenticated>} />
+            <Route path="/login" element={<RedirectIfAuthenticated><Login /></RedirectIfAuthenticated>} />
+            <Route path="/signup" element={<RedirectIfAuthenticated><Signup /></RedirectIfAuthenticated>} />
             <Route path="/shared/bookmark/:token" element={<SharedView />} />
             <Route path="/shared/folder/:token" element={<SharedView />} />
             <Route path="/shared/tag/:token" element={<SharedView />} />
