@@ -68,6 +68,15 @@ export default function Landing() {
                             <Rocket className="w-5 h-5" />
                             Start Organizing Free
                         </Link>
+                        <a
+                            href="https://telegram.me/TgsaverMindvault_bot"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="w-full sm:w-auto px-6 py-3 bg-[#0088cc] hover:bg-[#007ab8] text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-3"
+                        >
+                            <i className="fab fa-telegram-plane inline-block w-5 h-5" aria-hidden="true"></i>
+                            Start With Telegram Bot
+                        </a>
                         <a href="#demo" className="w-full sm:w-auto px-8 py-4 bg-surface border border-gray-700 hover:bg-gray-800 text-white font-bold rounded-xl transition hover:scale-105 flex items-center justify-center gap-3">
                             <PlayCircle className="w-5 h-5" />
                             Watch Demo

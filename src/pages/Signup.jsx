@@ -102,6 +102,16 @@ export default function Signup() {
                     Sign in with Google
                 </button>
 
+                <a
+                    href="https://telegram.me/TgsaverMindvault_bot"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-3 mb-4 bg-[#0088cc] text-white font-semibold rounded flex items-center justify-center gap-2 hover:bg-[#007ab8] transition"
+                >
+                    <i className="fab fa-telegram-plane inline-block" aria-hidden="true" style={{ fontSize: '1.125rem' }}></i>
+                    Start With Telegram Bot
+                </a>
+
                 <div className="relative mb-6">
                     <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-gray-700"></div>
