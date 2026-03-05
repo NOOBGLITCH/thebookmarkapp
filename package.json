@@ -7,10 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
+    "preview": "npm run build && wrangler dev",
     "supabase": "supabase",
     "supabase:list": "supabase projects list",
-    "supabase:push": "supabase db push"
+    "supabase:push": "supabase db push",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.1",
@@ -21,6 +22,7 @@
     "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.26.0",
     "@eslint/js": "^9.39.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
@@ -34,6 +36,7 @@
     "supabase": "^2.72.9",
     "tailwindcss": "^3.4.17",
     "vite": "^7.2.4",
-    "vite-plugin-pwa": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "wrangler": "^4.70.0"
   }
 }
