@@ -1,0 +1,7 @@
+{
+  "schedule": "weekly",
+  "ignoredFiles": [
+    "assets/raw/*"
+  ],
+  "aggressiveCompression": false
+}
