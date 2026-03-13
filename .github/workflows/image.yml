@@ -1,55 +1,54 @@
 name: Lossless Image Optimization
 
 on:
-push:
-branches:
-- main
-- master
-pull_request:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
 
 jobs:
-optimize-images:
-runs-on: ubuntu-latest
+  optimize-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+      - name: Install optimization tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pngquant optipng jpegoptim gifsicle webp imagemagick
+          npm install -g svgo
 
-  - name: Install optimization tools
-    run: |
-      sudo apt-get update
-      sudo apt-get install -y pngquant optipng jpegoptim gifsicle webp imagemagick
-      npm install -g svgo
+      - name: Optimize images
+        run: |
+          # PNG
+          find . -type f -iname "*.png" -exec optipng -o2 {} \;
 
-  - name: Optimize images
-    run: |
-      # PNG
-      find . -type f -iname "*.png" -exec optipng -o2 {} \;
+          # JPG / JPEG
+          find . -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -exec jpegoptim --strip-all {} \;
 
-      # JPG / JPEG
-      find . -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -exec jpegoptim --strip-all {} \;
+          # GIF
+          find . -type f -iname "*.gif" -exec gifsicle -O3 -b {} \;
 
-      # GIF
-      find . -type f -iname "*.gif" -exec gifsicle -O3 -b {} \;
+          # SVG
+          find . -type f -iname "*.svg" -exec svgo {} \;
 
-      # SVG
-      find . -type f -iname "*.svg" -exec svgo {} \;
+          # WEBP - note: cwebp usually requires an output flag
+          find . -type f -iname "*.webp" -exec cwebp -quiet {} -o {} \;
 
-      # WEBP
-      find . -type f -iname "*.webp" -exec cwebp -quiet {} -o {} \;
+          # ICO
+          find . -type f -iname "*.ico" -exec convert {} -strip {} \;
 
-      # ICO
-      find . -type f -iname "*.ico" -exec convert {} -strip {} \;
-
-  - name: Commit optimized images
-    run: |
-      git config --global user.name "github-actions"
-      git config --global user.email "actions@github.com"
-      git add .
-
-      if git diff --cached --quiet; then
-        echo "No changes"
-      else
-        git commit -m "chore: optimize images"
-        git push
-      fi
+      - name: Commit optimized images
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: optimize images"
+            git push
+          fi
