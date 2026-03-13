@@ -22,28 +22,24 @@ steps:
       sudo apt-get install -y pngquant optipng jpegoptim gifsicle webp imagemagick
       npm install -g svgo
 
-  - name: Optimize PNG
+  - name: Optimize images
     run: |
+      # PNG
       find . -type f -iname "*.png" -exec optipng -o2 {} \;
 
-  - name: Optimize JPG/JPEG
-    run: |
+      # JPG / JPEG
       find . -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -exec jpegoptim --strip-all {} \;
 
-  - name: Optimize GIF
-    run: |
+      # GIF
       find . -type f -iname "*.gif" -exec gifsicle -O3 -b {} \;
 
-  - name: Optimize SVG
-    run: |
+      # SVG
       find . -type f -iname "*.svg" -exec svgo {} \;
 
-  - name: Optimize WEBP
-    run: |
+      # WEBP
       find . -type f -iname "*.webp" -exec cwebp -quiet {} -o {} \;
 
-  - name: Optimize ICO
-    run: |
+      # ICO
       find . -type f -iname "*.ico" -exec convert {} -strip {} \;
 
   - name: Commit optimized images
@@ -58,4 +54,4 @@ steps:
         git commit -m "chore: optimize images"
         git push
       fi
-```
+
