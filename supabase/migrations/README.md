@@ -14,6 +14,10 @@
 | Schema extensions | `11_schema_visibility_and_depth.sql` | Visibility column and folder max depth |
 | RPCs sharing | `12_sharing_rpcs.sql` | create_*_share, get_shared_folder, get_shared_tag, revoke_*_share |
 | RPCs import/export/backup | `13_import_export_backup_rpcs.sql` | import_bookmarks, export_bookmarks, snapshot_bookmarks |
+| Maintenance | `14_backfill_missing_profiles.sql` | Backfill missing profiles |
+| Maintenance/Fixes | `15_fix_delete_cleanup.sql` | Fix delete cleanup for profiles |
+| Maintenance/Fixes | `16_fix_pgcrypto_search_path.sql` | Fix pgcrypto search path |
+| Maintenance/Fixes | `17_fix_share_ambiguity.sql` | Fix share ambiguity issues |
 | Maintenance | `cleanup_tags_all_users.sql` | Cleanup orphaned/duplicate tags |
 | Maintenance | `reset_rls_policies.sql` | Reset RLS policies |
 
@@ -30,6 +34,6 @@ In Supabase **SQL Editor**, run in this order:
 
 Use **00_init_full_database.sql** only if you want the legacy init (no share tables); then run 11, 12, 13 after it (skip 10).
 
-Maintenance scripts: run **cleanup_tags_all_users.sql** and **reset_rls_policies.sql** only when needed.
+Maintenance scripts: run **14**, **15**, **16**, **17**, **cleanup_tags_all_users.sql** and **reset_rls_policies.sql** only when needed.
 
 See [../MIGRATIONS_INDEX.md](../MIGRATIONS_INDEX.md) for how each file links to the frontend and backend.

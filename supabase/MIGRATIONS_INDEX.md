@@ -13,6 +13,10 @@ Full list of SQL files, categorized, with run order and how they link to the fro
 | **Schema extensions** | `11_schema_visibility_and_depth.sql` | Schema visibility and folder depth (visibility column, folder max 2 levels) |
 | **RPCs – sharing** | `12_sharing_rpcs.sql` | Sharing RPCs (create_bookmark_share, create_folder_share, create_tag_share, get_shared_folder, get_shared_tag, revoke_*_share) |
 | **RPCs – import/export/backup** | `13_import_export_backup_rpcs.sql` | Import export backup RPCs (import_bookmarks, export_bookmarks, snapshot_bookmarks) |
+| **Maintenance** | `14_backfill_missing_profiles.sql` | Backfill missing profiles for existing auth.users |
+| **Maintenance/Fixes** | `15_fix_delete_cleanup.sql` | Fix delete cleanup for shared profiles |
+| **Maintenance/Fixes** | `16_fix_pgcrypto_search_path.sql` | Fix pgcrypto search path for secure functions |
+| **Maintenance/Fixes** | `17_fix_share_ambiguity.sql` | Fix sharing ambiguity for nested folders |
 | **Maintenance** | `cleanup_tags_all_users.sql` | Cleanup tags for all users (orphaned/duplicate tags) |
 | **Maintenance** | `reset_rls_policies.sql` | Reset RLS policies |
 | — | `README.md` | Migrations readme (run order, usage) |
@@ -31,6 +35,10 @@ Run in this order in the Supabase SQL Editor:
 
 Maintenance (only when needed):
 
+- `14_backfill_missing_profiles.sql`  
+- `15_fix_delete_cleanup.sql`  
+- `16_fix_pgcrypto_search_path.sql`  
+- `17_fix_share_ambiguity.sql`  
 - `cleanup_tags_all_users.sql`  
 - `reset_rls_policies.sql`  
 
@@ -81,7 +89,7 @@ Maintenance (only when needed):
 - **Schema extensions**: `11_schema_visibility_and_depth.sql` – visibility column, folder depth.  
 - **RPCs – sharing**: `12_sharing_rpcs.sql` – create/revoke shares, get_shared_folder, get_shared_tag.  
 - **RPCs – import/export/backup**: `13_import_export_backup_rpcs.sql` – import_bookmarks, export_bookmarks, snapshot_bookmarks.  
-- **Maintenance**: `cleanup_tags_all_users.sql`, `reset_rls_policies.sql` – run only when needed.
+- **Maintenance**: `14_backfill_missing_profiles.sql`, `15_fix_delete_cleanup.sql`, `16_fix_pgcrypto_search_path.sql`, `17_fix_share_ambiguity.sql`, `cleanup_tags_all_users.sql`, `reset_rls_policies.sql` – run only when needed.
 
 For RPC contracts and visibility rules, see [MCP_API.md](MCP_API.md).  
 For pushing to a new Supabase project, see [NEW_PROJECT_PUSH.md](NEW_PROJECT_PUSH.md).
