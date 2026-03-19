@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar'
 import { Menu } from 'lucide-react'
 
 export default function DashboardLayout() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     return (
         <div className="flex min-h-screen bg-background">
