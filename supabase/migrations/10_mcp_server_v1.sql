@@ -217,14 +217,13 @@ USING (shared_by = auth.uid() OR shared_with = auth.uid());
 -- Get Public Bookmark by Token
 CREATE OR REPLACE FUNCTION get_shared_bookmark(token_input TEXT)
 RETURNS TABLE (
-    id UUID, url TEXT, title TEXT, description TEXT, created_at TIMESTAMPTZ, owner_email TEXT
+    id UUID, url TEXT, title TEXT, description TEXT, created_at TIMESTAMPTZ
 ) SECURITY DEFINER AS $$
 BEGIN
     RETURN QUERY
-    SELECT b.id, b.url, b.title, b.description, b.created_at, p.email
+    SELECT b.id, b.url, b.title, b.description, b.created_at
     FROM bookmark_shares s
     JOIN bookmarks b ON s.resource_id = b.id
-    JOIN profiles p ON b.user_id = p.id
     WHERE s.token = token_input
     AND (s.expires_at IS NULL OR s.expires_at > NOW());
 END;

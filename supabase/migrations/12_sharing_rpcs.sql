@@ -145,7 +145,10 @@ BEGIN
                 'id', b.id, 'url', b.url, 'title', b.title, 'description', b.description, 'created_at', b.created_at
             ) ORDER BY b.created_at DESC)
             FROM bookmarks b
-            WHERE b.folder_id = folder_id_val),
+            WHERE b.folder_id IN (
+                SELECT id FROM folders 
+                WHERE id = folder_id_val OR parent_id = folder_id_val
+            )),
             '[]'::jsonb
         )
     ) INTO result;

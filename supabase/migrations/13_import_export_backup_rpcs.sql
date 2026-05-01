@@ -70,8 +70,7 @@ BEGIN
             SELECT id INTO b_id FROM bookmarks WHERE user_id = uid AND url = b_url LIMIT 1;
             IF b_id IS NOT NULL THEN
                 UPDATE bookmarks SET title = b_title, description = b_desc, folder_id = folder_id_val, updated_at = NOW() WHERE id = b_id;
-                -- Sync tags for existing bookmark
-                DELETE FROM bookmark_tags WHERE bookmark_id = b_id;
+                -- Sync tags for existing bookmark (merge mode: don't delete existing)
                 FOREACH tag_name IN ARRAY b_tags LOOP
                     IF tag_name IS NOT NULL AND length(trim(tag_name)) > 0 THEN
                         INSERT INTO tags (user_id, name) VALUES (uid, trim(tag_name)) ON CONFLICT (user_id, name) DO NOTHING;
@@ -161,7 +160,7 @@ BEGIN
                 )
             ) INTO out_content
             FROM bookmarks b
-            WHERE b.user_id = uid AND b.folder_id = scope_id;
+            WHERE b.user_id = uid AND b.folder_id IN (SELECT id FROM folders WHERE id = scope_id OR parent_id = scope_id);
         ELSE
             -- scope = tag
             SELECT jsonb_agg(
@@ -184,7 +183,7 @@ BEGIN
                 out_content := out_content || '"' || replace(replace(COALESCE(bk.url,''), '"', '""'), E'\n', ' ') || '","' || replace(replace(COALESCE(bk.title,''), '"', '""'), E'\n', ' ') || '","' || replace(replace(COALESCE(bk.description,''), '"', '""'), E'\n', ' ') || '","' || bk.created_at || '"' || E'\n';
             END LOOP;
         ELSIF scope = 'folder' THEN
-            FOR bk IN SELECT b.url, b.title, b.description, b.created_at FROM bookmarks b WHERE b.user_id = uid AND b.folder_id = scope_id
+            FOR bk IN SELECT b.url, b.title, b.description, b.created_at FROM bookmarks b WHERE b.user_id = uid AND b.folder_id IN (SELECT id FROM folders WHERE id = scope_id OR parent_id = scope_id)
             LOOP
                 out_content := out_content || '"' || replace(replace(COALESCE(bk.url,''), '"', '""'), E'\n', ' ') || '","' || replace(replace(COALESCE(bk.title,''), '"', '""'), E'\n', ' ') || '","' || replace(replace(COALESCE(bk.description,''), '"', '""'), E'\n', ' ') || '","' || bk.created_at || '"' || E'\n';
             END LOOP;
@@ -204,7 +203,7 @@ BEGIN
                 out_content := out_content || '<dt><a href="' || replace(bk.url, '&', '&amp;') || '">' || replace(replace(COALESCE(bk.title, bk.url), '&', '&amp;'), '<', '&lt;') || '</a></dt><dd>' || replace(replace(COALESCE(bk.description, ''), '&', '&amp;'), '<', '&lt;') || '</dd>';
             END LOOP;
         ELSIF scope = 'folder' THEN
-            FOR bk IN SELECT b.url, b.title, b.description FROM bookmarks b WHERE b.user_id = uid AND b.folder_id = scope_id ORDER BY b.created_at DESC
+            FOR bk IN SELECT b.url, b.title, b.description FROM bookmarks b WHERE b.user_id = uid AND b.folder_id IN (SELECT id FROM folders WHERE id = scope_id OR parent_id = scope_id) ORDER BY b.created_at DESC
             LOOP
                 out_content := out_content || '<dt><a href="' || replace(bk.url, '&', '&amp;') || '">' || replace(replace(COALESCE(bk.title, bk.url), '&', '&amp;'), '<', '&lt;') || '</a></dt><dd>' || replace(replace(COALESCE(bk.description, ''), '&', '&amp;'), '<', '&lt;') || '</dd>';
             END LOOP;
