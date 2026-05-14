@@ -259,6 +259,30 @@ function parseHTMLMetadata(html, url) {
 }
 
 /**
+ * Fetch YouTube specific metadata via OEmbed
+ */
+async function fetchYouTubeMetadata(url) {
+    // Try YouTube OEmbed directly
+    try {
+        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`
+        const response = await fetch(oembedUrl)
+        if (response.ok) {
+            const data = await response.json()
+            return {
+                title: data.title || '',
+                description: data.author_name ? `Video by ${data.author_name}` : '',
+                favicon: 'https://www.youtube.com/s/desktop/80165780/img/favicon_32x32.png',
+                ogImage: data.thumbnail_url || '',
+                metaKeywords: 'youtube, video'
+            }
+        }
+    } catch (err) {
+        console.warn('Direct YouTube OEmbed failed, will try via proxy if needed')
+    }
+    return null
+}
+
+/**
  * Fetch URL content with multiple CORS proxy fallbacks and timeout
  */
 async function fetchURLContent(url) {
@@ -304,27 +328,33 @@ async function fetchURLContent(url) {
             const response = await fetchWithTimeout(proxyUrl, {
                 method: 'GET',
                 headers: {
-                    'Accept': 'text/html,application/xhtml+xml'
+                    'Accept': 'text/html,application/xhtml+xml,application/json'
                 }
             }, TIMEOUT)
 
             if (response.ok) {
                 const text = await response.text()
-                console.log(`✓ Fetched via: ${proxyUrl.split('?')[0]}`)
-                return text
+                if (text && text.length > 100) { // Ensure we got actual content
+                    console.log(`✓ Fetched via: ${proxyUrl.split('?')[0]}`)
+                    return text
+                }
             }
-            throw new Error('Response not OK')
+            throw new Error('Invalid response')
         } catch (error) {
-            console.warn('Proxy fetch failed:', error)
             throw error
         }
     })
 
     // Race all proxies and return first success
     try {
+        // Fallback for very old browsers or environments without Promise.any
+        if (!Promise.any) {
+            return await Promise.race(proxyPromises)
+        }
         return await Promise.any(proxyPromises)
-    } catch {
-        throw new Error('Unable to fetch URL. All proxies failed or timed out. Please enter details manually.')
+    } catch (error) {
+        console.error('All proxies failed:', error)
+        throw new Error('Unable to reach the website. This might be due to CORS restrictions or the site blocking proxies. Please enter details manually.')
     }
 }
 
@@ -336,11 +366,19 @@ export async function extractMetadata(url) {
         // Validate URL
         new URL(url) // Throws if invalid
 
-        // Fetch HTML content
-        const html = await fetchURLContent(url)
+        // 1. Special handling for YouTube
+        const domain = extractDomain(url)
+        let metadata = null
 
-        // Parse metadata
-        const metadata = parseHTMLMetadata(html, url)
+        if (domain.includes('youtube.com') || domain.includes('youtu.be')) {
+            metadata = await fetchYouTubeMetadata(url)
+        }
+
+        // 2. If not YouTube or YouTube OEmbed failed, try generic fetch
+        if (!metadata) {
+            const html = await fetchURLContent(url)
+            metadata = parseHTMLMetadata(html, url)
+        }
 
         // Upload image to ImgBB if available
         let processedImage = metadata.ogImage

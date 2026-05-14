@@ -1,0 +1,322 @@
+{
+  "/home/edith/Pictures/thebookmarkapp/vite.config.js": {
+    "mtime": 1777631020.9103947,
+    "hash": "176595a44eceadbcae9e8a4e8e84a7b3"
+  },
+  "/home/edith/Pictures/thebookmarkapp/eslint.config.js": {
+    "mtime": 1777631020.901394,
+    "hash": "49c8473bcfcec3aef596a5fb04a6df06"
+  },
+  "/home/edith/Pictures/thebookmarkapp/tailwind.config.js": {
+    "mtime": 1777631020.9103947,
+    "hash": "185804392e74bfa1be24ddd24e44c7e0"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase-schema-complete.sql": {
+    "mtime": 1777631020.9083943,
+    "hash": "f21c1294fb4d9a52ef4af277f52b9593"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase-migration-tags-public.sql": {
+    "mtime": 1777631020.9083943,
+    "hash": "88b7e3b43bbce3e476577712b44add07"
+  },
+  "/home/edith/Pictures/thebookmarkapp/postcss.config.js": {
+    "mtime": 1777631020.902394,
+    "hash": "360ddbfd64664a70d07963c00dbc70a7"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase-migration-public-access.sql": {
+    "mtime": 1777631020.9083943,
+    "hash": "84097fe00dcbe9771bd238199c2d9aea"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/17_fix_share_ambiguity.sql": {
+    "mtime": 1777631020.9103425,
+    "hash": "07fc77d82bcc5ace3f9c1d90f0ad7b48"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/10_mcp_server_v1.sql": {
+    "mtime": 1777636502.4002357,
+    "hash": "92ad5ff37b6e8c72fcc80dbd2969cc9f"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/cleanup_tags_all_users.sql": {
+    "mtime": 1777631020.9103947,
+    "hash": "75600b73843cc92ccf1bca215c6c4b8c"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/00_init_full_database.sql": {
+    "mtime": 1777631020.9093945,
+    "hash": "d59e3badd6c588cab93312811bb9b235"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/reset_rls_policies.sql": {
+    "mtime": 1777631020.9103947,
+    "hash": "e16f85fe734435a7d8311f9aafb5edc7"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/13_import_export_backup_rpcs.sql": {
+    "mtime": 1777636572.9750028,
+    "hash": "7117c35161a4a77e3be0bd5a2b7b73cb"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/15_fix_delete_cleanup.sql": {
+    "mtime": 1777631020.9103425,
+    "hash": "3dae44abd9ebd63881cd44568d41a11b"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/14_backfill_missing_profiles.sql": {
+    "mtime": 1777631020.9103425,
+    "hash": "feec3f5729e3dce416d8e511e1a4dfa6"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/11_schema_visibility_and_depth.sql": {
+    "mtime": 1777631020.9103425,
+    "hash": "d7667ec37efde2f690e3811636334c43"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/12_sharing_rpcs.sql": {
+    "mtime": 1777636508.065294,
+    "hash": "616925205a4eb830761d82490cfff34c"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/16_fix_pgcrypto_search_path.sql": {
+    "mtime": 1777631020.9103425,
+    "hash": "e0b0b585720ca231111593d59e2439e4"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/App.jsx": {
+    "mtime": 1777631020.903394,
+    "hash": "697b353bcc8e54da56298fa91240313b"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/main.jsx": {
+    "mtime": 1777631020.9063942,
+    "hash": "e13723e2574429d9a6d849727e3ff695"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/lib/supabase.js": {
+    "mtime": 1777631020.9063942,
+    "hash": "39ae51fc21c77ed023d8dae3dee56753"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/lib/database.types.ts": {
+    "mtime": 1777631020.9063942,
+    "hash": "edab9c86927063832679b0467efff8c7"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/pages/FavoritesView.jsx": {
+    "mtime": 1777631020.9071956,
+    "hash": "071d4a5074eda495a620f8061d91582f"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/pages/SharedView.jsx": {
+    "mtime": 1777631020.9073944,
+    "hash": "8001243fa5344df3957ad015edc02739"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/pages/Login.jsx": {
+    "mtime": 1777631020.9071956,
+    "hash": "ea9551ebe82ed4687404a0429e61e92d"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/pages/Dashboard.jsx": {
+    "mtime": 1777631020.9071956,
+    "hash": "6505872a45af873ac07e3490227a63b3"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/pages/Signup.jsx": {
+    "mtime": 1777631020.9083943,
+    "hash": "9eb5badf07a1ff048c1dd562a937ddb1"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/pages/Settings.jsx": {
+    "mtime": 1777631020.9071956,
+    "hash": "b476474a68c89d7fcca401b771ba5064"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/pages/BookmarksView.jsx": {
+    "mtime": 1777631020.9063942,
+    "hash": "f8308788f9dc3f91f87683961c1f3672"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/pages/Landing.jsx": {
+    "mtime": 1777631020.9071956,
+    "hash": "97346f4797bb85fcbb7fdf4cbc11ca51"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/context/BookmarkContext.jsx": {
+    "mtime": 1777631020.906345,
+    "hash": "6ab417ed2eebe78fb83d081d880b89de"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/context/AuthContext.jsx": {
+    "mtime": 1777631020.905527,
+    "hash": "de6f210fc69f2513d75fa89f2cf3fdff"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/services/metadataService.js": {
+    "mtime": 1777631020.9083943,
+    "hash": "b3122d3930dc14a53bf20696aa137358"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/components/SearchBar.jsx": {
+    "mtime": 1777631020.905527,
+    "hash": "5d06608d320bfdd16cb613ab8b95484e"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/components/FolderManager.jsx": {
+    "mtime": 1777631020.905527,
+    "hash": "3d2669c35990b613064504f996fdd763"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/components/ProtectedRoute.jsx": {
+    "mtime": 1777631020.905527,
+    "hash": "dc9fdbd7692f2a8b9cf82e05462b646f"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/components/TagInput.jsx": {
+    "mtime": 1777631020.905527,
+    "hash": "cd1ffd666283d4dbeeabd0a7157e5303"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/components/AddBookmarkModal.jsx": {
+    "mtime": 1777631020.9047499,
+    "hash": "b6709ea17575ebbdec8a6c4931d2e629"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/components/TagSidebar.jsx": {
+    "mtime": 1777631020.905527,
+    "hash": "6d70693e99b3845b3bbaf3ed3ad22ecd"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/components/RedirectIfAuthenticated.jsx": {
+    "mtime": 1777631020.905527,
+    "hash": "124600480d6ec6acea1168e4a3801cae"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/components/Sidebar.jsx": {
+    "mtime": 1777631020.905527,
+    "hash": "8dc5f92d54ea9ea747ddc70069d42697"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/components/InstallPWA.jsx": {
+    "mtime": 1777631020.905527,
+    "hash": "66636e889f1db8c40ab7826da325963b"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/layouts/DashboardLayout.jsx": {
+    "mtime": 1777631020.906345,
+    "hash": "4b6740053740c5c0fa513eef4ecc7c14"
+  },
+  "/home/edith/Pictures/thebookmarkapp/public/sw.js": {
+    "mtime": 1777631020.9032838,
+    "hash": "9972ae5cc5681adf0521749d5787e65c"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/local_poller.py": {
+    "mtime": 1777632798.7363682,
+    "hash": "e4a38cab0c270010fea2088e84babff6"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/utils/formatter.py": {
+    "mtime": 1777631936.198533,
+    "hash": "ed46ba8876b547a1236c757a7df75d18"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/utils/url_extractor.py": {
+    "mtime": 1777631936.198533,
+    "hash": "73ca6a6dbda3f17ae322f69023a2ef83"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/utils/metadata_fetcher.py": {
+    "mtime": 1777631936.198533,
+    "hash": "014b7b44f23eb274c95ed388ebf63984"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/utils/__init__.py": {
+    "mtime": 1777631936.1980817,
+    "hash": "d3d9a95b9b9d5ac2d5b9df8b7d632217"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/utils/tag_generator.py": {
+    "mtime": 1777631936.198533,
+    "hash": "7822fb25bd6a1d3073925edac3649b32"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/__init__.py": {
+    "mtime": 1777631936.1961474,
+    "hash": "9ecd03206092cd4de355ba670b15d751"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/index.py": {
+    "mtime": 1777638609.8654976,
+    "hash": "95f40c643776bdfdd251c6a0c67876e6"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/config.py": {
+    "mtime": 1777632581.3331401,
+    "hash": "7d419ae8b5320d9f590e227bdc4c3d70"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/utils/formatter.py": {
+    "mtime": 1777636210.3621585,
+    "hash": "60ffed562f78441cc6348e7fe8331e9b"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/utils/url_extractor.py": {
+    "mtime": 1777631936.1974583,
+    "hash": "e9685c6409e76722b92861031dc1f225"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/utils/metadata_fetcher.py": {
+    "mtime": 1777631936.1974583,
+    "hash": "25c9223117c882a149d5c3681479d2d1"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/utils/__init__.py": {
+    "mtime": 1777631936.1972442,
+    "hash": "d3d9a95b9b9d5ac2d5b9df8b7d632217"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/utils/tag_generator.py": {
+    "mtime": 1777635678.9228766,
+    "hash": "f9365319e9647983b137346fa6acf434"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/utils/supabase_sync.py": {
+    "mtime": 1777717764.0668535,
+    "hash": "3c0643dbc420b8707b16c31289bb4402"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/scripts/set_webhook.py": {
+    "mtime": 1777631936.1980817,
+    "hash": "2b09238bf25eb809d1c912c3cbe84a56"
+  },
+  "/home/edith/Pictures/thebookmarkapp/index.html": {
+    "mtime": 1777631020.901394,
+    "hash": "ec2ccb952aff96618a8e70fa190be63c"
+  },
+  "/home/edith/Pictures/thebookmarkapp/README.md": {
+    "mtime": 1777631020.901394,
+    "hash": "94a35e5242a6edbab2e8368d3d313e63"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/NEW_PROJECT_PUSH.md": {
+    "mtime": 1777631020.9093945,
+    "hash": "72115835d762cf1e41b0042a26fda737"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/MIGRATIONS_INDEX.md": {
+    "mtime": 1777631020.9093945,
+    "hash": "54b0a12a29e9ef51649aae07bc08a52d"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/AUTH_EMAIL_CONFIRM_OFF.md": {
+    "mtime": 1777631020.9083943,
+    "hash": "e6639ba4511272388dd2868afd064ae5"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/MCP_API.md": {
+    "mtime": 1777631020.9093945,
+    "hash": "09007bb49f697ceda15d8c51360a0d5e"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/MCP_AND_ACCESS_TOKEN.md": {
+    "mtime": 1777631020.9093945,
+    "hash": "73ed6d7d058a7fc922fc1cf7c0ffb920"
+  },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/README.md": {
+    "mtime": 1777631020.9103947,
+    "hash": "3fb7956fe2092a5a178e8f998b16a5e3"
+  },
+  "/home/edith/Pictures/thebookmarkapp/graphify/README.md": {
+    "mtime": 1778739024.9875708,
+    "hash": "7149a9336483e20f1f8c647f8dd5d199"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/docker-compose.yml": {
+    "mtime": 1777631936.1980817,
+    "hash": "53e2d075ac729fdec26d95a218accb7f"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/DEPLOYMENT.md": {
+    "mtime": 1777631936.1960878,
+    "hash": "f973cd768ec76a00595f3757a26d8834"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/README.md": {
+    "mtime": 1777631936.1961474,
+    "hash": "926ca4c88e3e1a69b38fce0d1d7edf5f"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/FINAL_STATUS.md": {
+    "mtime": 1777631936.1961474,
+    "hash": "cf8f46375893d12218a768287b441368"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/QUICKSTART.md": {
+    "mtime": 1777631936.1961474,
+    "hash": "3946ff5810f704743ab7006afd2ed3d0"
+  },
+  "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/api/requirements.txt": {
+    "mtime": 1777632564.656584,
+    "hash": "9ef3190b7214e9986acf6dbccad70571"
+  },
+  "/home/edith/Pictures/thebookmarkapp/src/image.png": {
+    "mtime": 1777631020.906345,
+    "hash": "f95bff69dc540881407406bcbc0e2d83"
+  },
+  "/home/edith/Pictures/thebookmarkapp/public/favicon.png": {
+    "mtime": 1777631020.902394,
+    "hash": "c9ef6df415ff3f56b926c27e02848698"
+  },
+  "/home/edith/Pictures/thebookmarkapp/public/icon-512.png": {
+    "mtime": 1777631020.9032838,
+    "hash": "09c6ebcbf6603ef5d0627f7db7f808be"
+  },
+  "/home/edith/Pictures/thebookmarkapp/public/logo.png": {
+    "mtime": 1777631020.9032838,
+    "hash": "c9ef6df415ff3f56b926c27e02848698"
+  },
+  "/home/edith/Pictures/thebookmarkapp/public/icon-192.png": {
+    "mtime": 1777631020.9032838,
+    "hash": "e729ab4903b3c745323dcd74fbb8d666"
+  }
+}

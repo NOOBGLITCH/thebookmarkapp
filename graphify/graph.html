@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>/ — graphify tree viewer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      margin: 20px 0 0 24px;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #1e3a56;
+    }
+    .controls {
+      margin: 20px 0 15px 24px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 8px 18px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:active {
+      background: #004085;
+    }
+    #tree-container {
+      width: calc(100vw - 48px); /* Adjust for body margin/padding */
+      height: 85vh;
+      overflow: auto;
+      border-radius: 8px;
+      background: #fff;
+      margin-left: 24px;
+      margin-right: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid #ddd;
+    }
+    svg {
+      background: #fff;
+      border-radius: 8px;
+      display: block; /* Important for D3 */
+    }
+    .node circle {
+      stroke-width: 2.5px;
+    }
+    .node text { /* Base style for the <text> container */
+      font: 13px 'Segoe UI', sans-serif;
+      paint-order: stroke fill; /* Ensures text is readable over lines */
+      stroke: #fff; /* White halo */
+      stroke-width: 3px; /* Halo thickness */
+      stroke-linejoin: round;
+      stroke-opacity: 0.85; /* Halo opacity */
+    }
+    .link {
+      fill: none;
+      stroke-opacity: 0.7;
+      stroke-width: 2px;
+    }
+  </style>
+</head>
+<body>
+  <h1>/ — Knowledge Graph</h1>
+  <div class="controls">
+    <button onclick="expandAll()">Expand All</button>
+    <button onclick="collapseAll()">Collapse All</button>
+    <button onclick="resetView()">Reset View</button>
+  </div>
+  <div id="tree-container">
+    <svg id="tree-svg" width="6000" height="8000"></svg>
+  </div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const initialJsonData = {"name":"/","total_count":347,"children":[{"name":"graphify","total_count":5,"children":[{"name":"README.md","total_count":5,"children":[{"name":"code:bash (# From the project root)","total_count":1,"children":[]},{"name":"Graphify Output","total_count":1,"children":[]},{"name":"How to generate the graph","total_count":1,"children":[]},{"name":"README.md","total_count":1,"children":[]},{"name":"Updating the graph","total_count":1,"children":[]}]}]},{"name":"public","total_count":1,"children":[{"name":"sw.js","total_count":1,"children":[{"name":"urlsToCache","total_count":1,"children":[]}]}]},{"name":"README.md","total_count":12,"children":[{"name":"code:bash (git clone https://github.com/NOOBGLITCH/thebookmarkapp.git)","total_count":1,"children":[]},{"name":"code:bash (npm install)","total_count":1,"children":[]},{"name":"code:bash (npm run dev)","total_count":1,"children":[]},{"name":"code:env (VITE_SUPABASE_URL=https://your-project.supabase.co)","total_count":1,"children":[]},{"name":"Installation","total_count":1,"children":[]},{"name":"Prerequisites","total_count":1,"children":[]},{"name":"README.md","total_count":1,"children":[]},{"name":"📜 License","total_count":1,"children":[]},{"name":"📦 Getting Started","total_count":1,"children":[]},{"name":"🚀 Deployment","total_count":1,"children":[]},{"name":"🚀 Features","total_count":1,"children":[]},{"name":"🛠️ Tech Stack","total_count":1,"children":[]}]},{"name":"src","total_count":51,"children":[{"name":"App.jsx","total_count":1,"children":[{"name":"App()","total_count":1,"children":[]}]},{"name":"components","total_count":9,"children":[{"name":"AddBookmarkModal.jsx","total_count":1,"children":[{"name":"AddBookmarkModal()","total_count":1,"children":[]}]},{"name":"FolderManager.jsx","total_count":1,"children":[{"name":"FolderManager()","total_count":1,"children":[]}]},{"name":"InstallPWA.jsx","total_count":1,"children":[{"name":"InstallPWA()","total_count":1,"children":[]}]},{"name":"ProtectedRoute.jsx","total_count":1,"children":[{"name":"ProtectedRoute()","total_count":1,"children":[]}]},{"name":"RedirectIfAuthenticated.jsx","total_count":1,"children":[{"name":"RedirectIfAuthenticated()","total_count":1,"children":[]}]},{"name":"SearchBar.jsx","total_count":1,"children":[{"name":"SearchBar()","total_count":1,"children":[]}]},{"name":"Sidebar.jsx","total_count":1,"children":[{"name":"Sidebar()","total_count":1,"children":[]}]},{"name":"TagInput.jsx","total_count":1,"children":[{"name":"TagInput()","total_count":1,"children":[]}]},{"name":"TagSidebar.jsx","total_count":1,"children":[{"name":"TagSidebar()","total_count":1,"children":[]}]}]},{"name":"context","total_count":6,"children":[{"name":"AuthContext.jsx","total_count":3,"children":[{"name":"AuthContext","total_count":1,"children":[]},{"name":"AuthProvider()","total_count":1,"children":[]},{"name":"useAuth()","total_count":1,"children":[]}]},{"name":"BookmarkContext.jsx","total_count":3,"children":[{"name":"BookmarkContext","total_count":1,"children":[]},{"name":"BookmarkProvider()","total_count":1,"children":[]},{"name":"useBookmarks()","total_count":1,"children":[]}]}]},{"name":"layouts","total_count":1,"children":[{"name":"DashboardLayout.jsx","total_count":1,"children":[{"name":"DashboardLayout()","total_count":1,"children":[]}]}]},{"name":"lib","total_count":11,"children":[{"name":"database.types.ts","total_count":10,"children":[{"name":"CompositeTypes","total_count":1,"children":[]},{"name":"Constants","total_count":1,"children":[]},{"name":"Database","total_count":1,"children":[]},{"name":"DatabaseWithoutInternals","total_count":1,"children":[]},{"name":"DefaultSchema","total_count":1,"children":[]},{"name":"Enums","total_count":1,"children":[]},{"name":"Json","total_count":1,"children":[]},{"name":"Tables","total_count":1,"children":[]},{"name":"TablesInsert","total_count":1,"children":[]},{"name":"TablesUpdate","total_count":1,"children":[]}]},{"name":"supabase.js","total_count":1,"children":[{"name":"supabase","total_count":1,"children":[]}]}]},{"name":"pages","total_count":9,"children":[{"name":"BookmarksView.jsx","total_count":1,"children":[{"name":"BookmarksView()","total_count":1,"children":[]}]},{"name":"Dashboard.jsx","total_count":1,"children":[{"name":"Dashboard()","total_count":1,"children":[]}]},{"name":"FavoritesView.jsx","total_count":1,"children":[{"name":"FavoritesView()","total_count":1,"children":[]}]},{"name":"Landing.jsx","total_count":1,"children":[{"name":"Landing()","total_count":1,"children":[]}]},{"name":"Login.jsx","total_count":1,"children":[{"name":"Login()","total_count":1,"children":[]}]},{"name":"Settings.jsx","total_count":1,"children":[{"name":"Settings()","total_count":1,"children":[]}]},{"name":"SharedView.jsx","total_count":2,"children":[{"name":"BookmarkCard()","total_count":1,"children":[]},{"name":"SharedView()","total_count":1,"children":[]}]},{"name":"Signup.jsx","total_count":1,"children":[{"name":"Signup()","total_count":1,"children":[]}]}]},{"name":"services","total_count":13,"children":[{"name":"metadataService.js","total_count":13,"children":[{"name":"DOMAIN_TAG_MAP","total_count":1,"children":[]},{"name":"extractDomain()","total_count":1,"children":[]},{"name":"extractDomainTags()","total_count":1,"children":[]},{"name":"extractKeywordsFromText()","total_count":1,"children":[]},{"name":"extractMetadata()","total_count":1,"children":[]},{"name":"extractPathKeywords()","total_count":1,"children":[]},{"name":"extractTagsFromFolderPath()","total_count":1,"children":[]},{"name":"fetchURLContent()","total_count":1,"children":[]},{"name":"generateTagsFromText()","total_count":1,"children":[]},{"name":"parseHTMLMetadata()","total_count":1,"children":[]},{"name":"PRIORITY_KEYWORDS","total_count":1,"children":[]},{"name":"STOP_WORDS","total_count":1,"children":[]},{"name":"uploadToImgBB()","total_count":1,"children":[]}]}]},{"name":"main.jsx","total_count":1,"children":[]}]},{"name":"supabase","total_count":62,"children":[{"name":"AUTH_EMAIL_CONFIRM_OFF.md","total_count":4,"children":[{"name":"AUTH_EMAIL_CONFIRM_OFF.md","total_count":1,"children":[]},{"name":"If you still get \"Failed to fetch\" on sign up","total_count":1,"children":[]},{"name":"Steps","total_count":1,"children":[]},{"name":"Turn off email verification (confirm email)","total_count":1,"children":[]}]},{"name":"MCP_AND_ACCESS_TOKEN.md","total_count":14,"children":[{"name":"1. List projects and push (CLI)","total_count":1,"children":[]},{"name":"2. Supabase MCP in Cursor","total_count":1,"children":[]},{"name":"3. New project: create then push","total_count":1,"children":[]},{"name":"code:bash (cd \"/home/edith/Downloads/images/the bookmark app\")","total_count":1,"children":[]},{"name":"code:bash (cd \"/home/edith/Downloads/images/the bookmark app\")","total_count":1,"children":[]},{"name":"code:bash (export SUPABASE_ACCESS_TOKEN=\"sbp_6a8d0e6c005d8fe8dca70a77fe)","total_count":1,"children":[]},{"name":"code:bash (npm install -g supabase)","total_count":1,"children":[]},{"name":"code:bash (supabase link --project-ref YOUR_PROJECT_REF)","total_count":1,"children":[]},{"name":"code:block1 (sbp_6a8d0e6c005d8fe8dca70a77fe3a37334bb83c78)","total_count":1,"children":[]},{"name":"code:env (VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co)","total_count":1,"children":[]},{"name":"MCP_AND_ACCESS_TOKEN.md","total_count":1,"children":[]},{"name":"Security","total_count":1,"children":[]},{"name":"Supabase access token and MCP – list project, push","total_count":1,"children":[]},{"name":"Your access token","total_count":1,"children":[]}]},{"name":"MCP_API.md","total_count":19,"children":[{"name":"create_bookmark_share(resource_id, expires_at?, permission_level?)","total_count":1,"children":[]},{"name":"create_folder_share(resource_id, expires_at?, permission_level?)","total_count":1,"children":[]},{"name":"create_tag_share(resource_id, expires_at?, permission_level?)","total_count":1,"children":[]},{"name":"export_bookmarks(format TEXT, scope TEXT, scope_id UUID?)","total_count":1,"children":[]},{"name":"FlowMark Supabase MCP – API Reference","total_count":1,"children":[]},{"name":"get_shared_bookmark(token_input TEXT)","total_count":1,"children":[]},{"name":"get_shared_folder(token_input TEXT)","total_count":1,"children":[]},{"name":"get_shared_tag(token_input TEXT)","total_count":1,"children":[]},{"name":"Import / Export / Backup (authenticated)","total_count":1,"children":[]},{"name":"import_bookmarks(payload JSONB)","total_count":1,"children":[]},{"name":"MCP_API.md","total_count":1,"children":[]},{"name":"Public read-only RPCs (anon allowed)","total_count":1,"children":[]},{"name":"Rate limiting","total_count":1,"children":[]},{"name":"revoke_bookmark_share(share_token TEXT)","total_count":1,"children":[]},{"name":"revoke_folder_share(share_token TEXT), revoke_tag_share(share_token TEXT)","total_count":1,"children":[]},{"name":"Run order","total_count":1,"children":[]},{"name":"Sharing RPCs (authenticated)","total_count":1,"children":[]},{"name":"snapshot_bookmarks()","total_count":1,"children":[]},{"name":"Visibility","total_count":1,"children":[]}]},{"name":"migrations","total_count":4,"children":[{"name":"README.md","total_count":4,"children":[{"name":"Directory: `supabase/migrations/`","total_count":1,"children":[]},{"name":"README.md","total_count":1,"children":[]},{"name":"Run order (new project)","total_count":1,"children":[]},{"name":"Supabase migrations – full directory and run order","total_count":1,"children":[]}]}]},{"name":"MIGRATIONS_INDEX.md","total_count":9,"children":[{"name":"Auth (Supabase Auth, not in SQL folder)","total_count":1,"children":[]},{"name":"Category summary","total_count":1,"children":[]},{"name":"Full directory: `supabase/migrations/`","total_count":1,"children":[]},{"name":"How SQL links to frontend and backend","total_count":1,"children":[]},{"name":"MIGRATIONS_INDEX.md","total_count":1,"children":[]},{"name":"RPCs → Frontend usage","total_count":1,"children":[]},{"name":"Run order (for new project or full reset)","total_count":1,"children":[]},{"name":"Supabase SQL folder – full directory and categories","total_count":1,"children":[]},{"name":"Tables → Frontend/backend usage","total_count":1,"children":[]}]},{"name":"NEW_PROJECT_PUSH.md","total_count":12,"children":[{"name":"1. Create a new Supabase project","total_count":1,"children":[]},{"name":"2. Get project URL and anon key","total_count":1,"children":[]},{"name":"3. Run migrations in order (SQL Editor)","total_count":1,"children":[]},{"name":"4. (Optional) Use Supabase CLI to push","total_count":1,"children":[]},{"name":"5. Frontend env and run","total_count":1,"children":[]},{"name":"6. Quick check","total_count":1,"children":[]},{"name":"code:bash (npm install)","total_count":1,"children":[]},{"name":"code:bash (supabase db push)","total_count":1,"children":[]},{"name":"code:bash (supabase link --project-ref YOUR_PROJECT_REF)","total_count":1,"children":[]},{"name":"code:env (VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co)","total_count":1,"children":[]},{"name":"Create new Supabase project and push migrations","total_count":1,"children":[]},{"name":"NEW_PROJECT_PUSH.md","total_count":1,"children":[]}]}]},{"name":"telegraamsaverbot","total_count":212,"children":[{"name":"api","total_count":77,"children":[{"name":"config.py","total_count":3,"children":[{"name":"Configuration module for serverless webhook Environment variables are provided d","total_count":1,"children":[]},{"name":"Validate that all required configuration is present","total_count":1,"children":[]},{"name":"validate_config()","total_count":1,"children":[]}]},{"name":"index.py","total_count":13,"children":[{"name":"Background task to fetch metadata, generate tags, and sync to Supabase.","total_count":1,"children":[]},{"name":"Detect media type from message          Args:         message: Telegram message","total_count":1,"children":[]},{"name":"Format message for media without caption","total_count":1,"children":[]},{"name":"format_media_only_message()","total_count":1,"children":[]},{"name":"get_media_type()","total_count":1,"children":[]},{"name":"Health check endpoint","total_count":1,"children":[]},{"name":"Main webhook handler for Telegram updates          Processes incoming messages a","total_count":1,"children":[]},{"name":"process_bookmark_sync()","total_count":1,"children":[]},{"name":"root()","total_count":1,"children":[]},{"name":"Send message to Telegram chat          Args:         chat_id: Telegram chat ID","total_count":1,"children":[]},{"name":"send_message()","total_count":1,"children":[]},{"name":"Telegram Instant Content Formatter Bot - Serverless Webhook Handler FastAPI-base","total_count":1,"children":[]},{"name":"webhook()","total_count":1,"children":[]}]},{"name":"utils","total_count":60,"children":[{"name":"__init__.py","total_count":1,"children":[{"name":"Utilities package for Telegram Content Formatter Bot","total_count":1,"children":[]}]},{"name":"formatter.py","total_count":9,"children":[{"name":"Format bot response with HTML     Telegram Bot API supports HTML formatting","total_count":1,"children":[]},{"name":"Format error message using simple Markdown","total_count":1,"children":[]},{"name":"Format message for media without caption","total_count":1,"children":[]},{"name":"format_error_message()","total_count":1,"children":[]},{"name":"format_media_only_message()","total_count":1,"children":[]},{"name":"format_response()","total_count":1,"children":[]},{"name":"Get current time in IST timezone          Returns:         Current datetime in I","total_count":1,"children":[]},{"name":"get_current_ist_time()","total_count":1,"children":[]},{"name":"Response formatting utilities Optimized for Telegram Bot API HTML format","total_count":1,"children":[]}]},{"name":"metadata_fetcher.py","total_count":9,"children":[{"name":"_extract_description()","total_count":1,"children":[]},{"name":"_extract_title()","total_count":1,"children":[]},{"name":"_fetch_youtube_oembed()","total_count":1,"children":[]},{"name":"Extract description from HTML with priority order          Args:         soup: B","total_count":1,"children":[]},{"name":"Extract title from HTML with priority order          Args:         soup: Beautif","total_count":1,"children":[]},{"name":"Fetch metadata (title, description) from URL          Priority order:     1. Ope","total_count":1,"children":[]},{"name":"Fetch metadata from YouTube oEmbed API     Reliable way to get video title and a","total_count":1,"children":[]},{"name":"fetch_metadata()","total_count":1,"children":[]},{"name":"Metadata fetching from URLs Extracts title and description using Open Graph tags","total_count":1,"children":[]}]},{"name":"supabase_sync.py","total_count":15,"children":[{"name":"Generate a link and immediately link the Telegram chat_id (Admin only).","total_count":1,"children":[]},{"name":"Get Supabase user_id by Telegram chat_id.","total_count":1,"children":[]},{"name":"get_headers()","total_count":1,"children":[]},{"name":"get_user_by_chat_id()","total_count":1,"children":[]},{"name":"instant_login()","total_count":1,"children":[]},{"name":"Login with Supabase and link Telegram chat_id to the user profile.","total_count":1,"children":[]},{"name":"login_user()","total_count":1,"children":[]},{"name":"logout_user()","total_count":1,"children":[]},{"name":"Send a magic link / OTP to the user's email.","total_count":1,"children":[]},{"name":"send_otp()","total_count":1,"children":[]},{"name":"Sync a formatted bookmark and its tags to Supabase.","total_count":1,"children":[]},{"name":"sync_bookmark()","total_count":1,"children":[]},{"name":"Unlink Telegram chat_id from the user profile.","total_count":1,"children":[]},{"name":"Verify OTP or Magic Link token and link Telegram chat_id to the user profile.","total_count":1,"children":[]},{"name":"verify_otp()","total_count":1,"children":[]}]},{"name":"tag_generator.py","total_count":17,"children":[{"name":"_detect_category()","total_count":1,"children":[]},{"name":"_extract_scored_keywords()","total_count":1,"children":[]},{"name":"_extract_url_path_keywords()","total_count":1,"children":[]},{"name":"_get_domain_tags()","total_count":1,"children":[]},{"name":"_get_media_tag()","total_count":1,"children":[]},{"name":"_normalize_tag()","total_count":1,"children":[]},{"name":"_tokenize()","total_count":1,"children":[]},{"name":"Advanced tag generation with intelligent keyword extraction Uses NLP-inspired te","total_count":1,"children":[]},{"name":"Detect content category from keywords","total_count":1,"children":[]},{"name":"Extract keywords from URL path segments","total_count":1,"children":[]},{"name":"Extract keywords with TF-IDF-like scoring     Title words get 3x weight, descrip","total_count":1,"children":[]},{"name":"Extract meaningful words from text","total_count":1,"children":[]},{"name":"Generate intelligent, relevant tags using advanced keyword extraction          A","total_count":1,"children":[]},{"name":"generate_tags()","total_count":1,"children":[]},{"name":"Get tag based on media type","total_count":1,"children":[]},{"name":"Get tags based on URL domain","total_count":1,"children":[]},{"name":"Normalize tag to proper hashtag format","total_count":1,"children":[]}]},{"name":"url_extractor.py","total_count":9,"children":[{"name":"clean_url()","total_count":1,"children":[]},{"name":"Extract all HTTP/HTTPS URLs from text          Args:         text: Input text co","total_count":1,"children":[]},{"name":"extract_urls()","total_count":1,"children":[]},{"name":"Get the first valid URL from text          Args:         text: Input text","total_count":1,"children":[]},{"name":"get_first_valid_url()","total_count":1,"children":[]},{"name":"is_valid_url()","total_count":1,"children":[]},{"name":"Remove tracking parameters and clean URL          Args:         url: URL to clea","total_count":1,"children":[]},{"name":"URL extraction and validation utilities","total_count":1,"children":[]},{"name":"Validate if URL is properly formed and not pointing to private IPs          Args","total_count":1,"children":[]}]}]},{"name":"__init__.py","total_count":1,"children":[]}]},{"name":"DEPLOYMENT.md","total_count":45,"children":[{"name":"Bot Not Responding","total_count":1,"children":[]},{"name":"code:bash (cd /path/to/your/project)","total_count":1,"children":[]},{"name":"code:bash (cd api)","total_count":1,"children":[]},{"name":"code:bash (cd scripts)","total_count":1,"children":[]},{"name":"code:bash (curl https://api.telegram.org/bot<YOUR_TOKEN>/getWebhookInfo)","total_count":1,"children":[]},{"name":"code:bash (curl https://api.telegram.org/bot<YOUR_TOKEN>/getWebhookInfo)","total_count":1,"children":[]},{"name":"code:bash (git add .)","total_count":1,"children":[]},{"name":"code:bash (ngrok http 8000)","total_count":1,"children":[]},{"name":"code:bash (npm install -g netlify-cli)","total_count":1,"children":[]},{"name":"code:bash (npm install -g vercel)","total_count":1,"children":[]},{"name":"code:bash (vercel --prod)","total_count":1,"children":[]},{"name":"code:bash (vercel env add BOT_TOKEN)","total_count":1,"children":[]},{"name":"code:bash (vercel logs --follow)","total_count":1,"children":[]},{"name":"code:bash (vercel logs)","total_count":1,"children":[]},{"name":"code:toml ([build])","total_count":1,"children":[]},{"name":"Configure Netlify","total_count":1,"children":[]},{"name":"Cost","total_count":1,"children":[]},{"name":"Deploy to Netlify","total_count":1,"children":[]},{"name":"Deploy to Vercel (Recommended)","total_count":1,"children":[]},{"name":"Deployment Guide - Serverless Telegram Bot","total_count":1,"children":[]},{"name":"DEPLOYMENT.md","total_count":1,"children":[]},{"name":"Function Timeout","total_count":1,"children":[]},{"name":"Local Testing","total_count":1,"children":[]},{"name":"Manual Deployment Steps","total_count":1,"children":[]},{"name":"Manual Redeploy","total_count":1,"children":[]},{"name":"Monitoring","total_count":1,"children":[]},{"name":"Netlify Deployment","total_count":1,"children":[]},{"name":"Prerequisites","total_count":1,"children":[]},{"name":"Push Updates","total_count":1,"children":[]},{"name":"Quick Deploy","total_count":1,"children":[]},{"name":"Security Best Practices","total_count":1,"children":[]},{"name":"Step 1: Install Vercel CLI","total_count":1,"children":[]},{"name":"Step 2: Deploy to Vercel","total_count":1,"children":[]},{"name":"Step 3: Set Environment Variables","total_count":1,"children":[]},{"name":"Step 4: Register Webhook","total_count":1,"children":[]},{"name":"Step 5: Test Your Bot","total_count":1,"children":[]},{"name":"Support","total_count":1,"children":[]},{"name":"Test Locally Before Deployment","total_count":1,"children":[]},{"name":"Test with ngrok","total_count":1,"children":[]},{"name":"Troubleshooting","total_count":1,"children":[]},{"name":"Updating Your Bot","total_count":1,"children":[]},{"name":"Using Netlify CLI","total_count":1,"children":[]},{"name":"View Logs","total_count":1,"children":[]},{"name":"Webhook Errors","total_count":1,"children":[]},{"name":"Webhook Info","total_count":1,"children":[]}]},{"name":"FINAL_STATUS.md","total_count":27,"children":[{"name":"1. **Code Performance** ⚡","total_count":1,"children":[]},{"name":"2. **Dependencies Cleaned** 📦","total_count":1,"children":[]},{"name":"3. **Files Removed** 🗑️","total_count":1,"children":[]},{"name":"4. **Documentation Streamlined** 📝","total_count":1,"children":[]},{"name":"After:","total_count":1,"children":[]},{"name":"Before:","total_count":1,"children":[]},{"name":"code:bash (# In Telegram, send:)","total_count":1,"children":[]},{"name":"code:bash (# Start bot)","total_count":1,"children":[]},{"name":"code:bash (# Start)","total_count":1,"children":[]},{"name":"code:block1 (mindvault/)","total_count":1,"children":[]},{"name":"code:txt (pyrogram==2.0.106      # Telegram framework)","total_count":1,"children":[]},{"name":"Docker Deployment","total_count":1,"children":[]},{"name":"FINAL_STATUS.md","total_count":1,"children":[]},{"name":"Local Development","total_count":1,"children":[]},{"name":"✅ Bot Finalized & Optimized","total_count":1,"children":[]},{"name":"✅ Final Checklist","total_count":1,"children":[]},{"name":"✨ Features Working","total_count":1,"children":[]},{"name":"🎉 Status: PRODUCTION READY","total_count":1,"children":[]},{"name":"🎊 Summary","total_count":1,"children":[]},{"name":"🎯 What's Different Now","total_count":1,"children":[]},{"name":"📂 Final Project Structure","total_count":1,"children":[]},{"name":"📈 Next Steps (Optional)","total_count":1,"children":[]},{"name":"📊 Optimizations Applied","total_count":1,"children":[]},{"name":"📦 Dependencies (Final)","total_count":1,"children":[]},{"name":"🔧 Commands Reference","total_count":1,"children":[]},{"name":"🚀 Performance Metrics","total_count":1,"children":[]},{"name":"🧪 Test Commands","total_count":1,"children":[]}]},{"name":"local_poller.py","total_count":1,"children":[{"name":"main()","total_count":1,"children":[]}]},{"name":"QUICKSTART.md","total_count":11,"children":[{"name":"code:bash (cp .env.example .env)","total_count":1,"children":[]},{"name":"code:bash (docker-compose up -d)","total_count":1,"children":[]},{"name":"code:bash (python3 -m venv venv)","total_count":1,"children":[]},{"name":"code:env (API_ID=964098)","total_count":1,"children":[]},{"name":"Get Bot Running in 3 Steps","total_count":1,"children":[]},{"name":"Quick Start Guide","total_count":1,"children":[]},{"name":"QUICKSTART.md","total_count":1,"children":[]},{"name":"Step 1: Get Credentials","total_count":1,"children":[]},{"name":"Step 2: Configure","total_count":1,"children":[]},{"name":"Step 3: Run","total_count":1,"children":[]},{"name":"Test Your Bot","total_count":1,"children":[]}]},{"name":"README.md","total_count":33,"children":[{"name":"1. Get a Bot Token","total_count":1,"children":[]},{"name":"2. Deploy (Choose One)","total_count":1,"children":[]},{"name":"3. Set Environment Variables","total_count":1,"children":[]},{"name":"4. Register Webhook","total_count":1,"children":[]},{"name":"5. Start Using!","total_count":1,"children":[]},{"name":"code:bash (# Clone repository)","total_count":1,"children":[]},{"name":"code:bash (cd scripts)","total_count":1,"children":[]},{"name":"code:bash (npm install -g vercel)","total_count":1,"children":[]},{"name":"code:block2 (BOT_TOKEN=your_bot_token_here)","total_count":1,"children":[]},{"name":"code:block4 (📌 Content Saved)","total_count":1,"children":[]},{"name":"code:block6 (telegraamsaverbot/)","total_count":1,"children":[]},{"name":"Formatting","total_count":1,"children":[]},{"name":"Metadata Extraction","total_count":1,"children":[]},{"name":"Option A: Deploy to Vercel (Recommended)","total_count":1,"children":[]},{"name":"Option B: Deploy to Netlify","total_count":1,"children":[]},{"name":"README.md","total_count":1,"children":[]},{"name":"Tag Generation","total_count":1,"children":[]},{"name":"Telegram Content Formatter Bot 🤖","total_count":1,"children":[]},{"name":"✨ Features","total_count":1,"children":[]},{"name":"🌟 Key Features Explained","total_count":1,"children":[]},{"name":"🎯 Roadmap","total_count":1,"children":[]},{"name":"📁 Project Structure","total_count":1,"children":[]},{"name":"📊 Performance","total_count":1,"children":[]},{"name":"📋 What It Does","total_count":1,"children":[]},{"name":"📖 Documentation","total_count":1,"children":[]},{"name":"📝 License","total_count":1,"children":[]},{"name":"📞 Support","total_count":1,"children":[]},{"name":"🔒 Privacy & Security","total_count":1,"children":[]},{"name":"🔧 Local Development","total_count":1,"children":[]},{"name":"🙏 Acknowledgments","total_count":1,"children":[]},{"name":"🚀 Quick Start","total_count":1,"children":[]},{"name":"🛠️ Tech Stack","total_count":1,"children":[]},{"name":"🤝 Contributing","total_count":1,"children":[]}]},{"name":"scripts","total_count":6,"children":[{"name":"set_webhook.py","total_count":6,"children":[{"name":"Get current webhook info","total_count":1,"children":[]},{"name":"get_webhook_info()","total_count":1,"children":[]},{"name":"main()","total_count":1,"children":[]},{"name":"Script to set webhook URL for Telegram bot Run this after deploying to Vercel","total_count":1,"children":[]},{"name":"Set webhook URL for Telegram bot          Args:         bot_token: Telegram bot","total_count":1,"children":[]},{"name":"set_webhook()","total_count":1,"children":[]}]}]},{"name":"utils","total_count":12,"children":[{"name":"metadata_fetcher.py","total_count":2,"children":[{"name":"Extract description from HTML with priority order          Args:         soup: B","total_count":1,"children":[]},{"name":"Extract title from HTML with priority order          Args:         soup: Beautif","total_count":1,"children":[]}]},{"name":"tag_generator.py","total_count":7,"children":[{"name":"Detect content category from keywords","total_count":1,"children":[]},{"name":"Extract keywords with TF-IDF-like scoring     Title words get 3x weight, descrip","total_count":1,"children":[]},{"name":"Extract meaningful words from text","total_count":1,"children":[]},{"name":"Generate intelligent, relevant tags using advanced keyword extraction          A","total_count":1,"children":[]},{"name":"Get tag based on media type","total_count":1,"children":[]},{"name":"Get tags based on URL domain","total_count":1,"children":[]},{"name":"Normalize tag to proper hashtag format","total_count":1,"children":[]}]},{"name":"__init__.py","total_count":1,"children":[]},{"name":"formatter.py","total_count":1,"children":[]},{"name":"url_extractor.py","total_count":1,"children":[]}]}]},{"name":"eslint.config.js","total_count":1,"children":[]},{"name":"postcss.config.js","total_count":1,"children":[]},{"name":"tailwind.config.js","total_count":1,"children":[]},{"name":"vite.config.js","total_count":1,"children":[]}]};
+
+    function transformData(jsonData) {
+        // Helper function to recursively build the children structure
+        function processNode(node, parentL1StageName) {
+            let displayName = node.name;
+            // Append total_count if it exists and is not already in the name
+            if (node.total_count !== undefined) {
+                if (!/\(Total Count: \d+\)$/.test(displayName)) {
+                    displayName += ` (Total Count: ${node.total_count})`;
+                }
+            }
+
+            const newNode = { name: displayName };
+
+            if (parentL1StageName === "Root") {
+                 newNode.originalStageName = node.name;
+            } else {
+                newNode.originalStageName = parentL1StageName;
+            }
+
+            if (node.children && node.children.length > 0) {
+                const stageNameToPass = (parentL1StageName === "Root") ? node.name : parentL1StageName;
+                newNode.children = node.children.map(child => processNode(child, stageNameToPass));
+            }
+
+            return newNode;
+        }
+
+        let rootDisplayName = jsonData.name;
+        if (jsonData.total_count !== undefined && !/\(Total Count: \d+\)$/.test(rootDisplayName)) {
+            rootDisplayName += ` (Total Count: ${jsonData.total_count})`;
+        }
+
+        return {
+            name: rootDisplayName,
+            originalStageName: "Root",
+            children: (jsonData.children || []).map(child => processNode(child, "Root"))
+        };
+    }
+
+    const treeData = transformData(initialJsonData);
+
+    // Auto-populated phaseColors: every depth-1 child of the root gets
+    // a stable colour from a bigger palette so all top-level dirs are
+    // distinguishable.
+    const PALETTE = [
+      ["#3498DB","#2980B9","#AED6F1"], ["#2ECC71","#27AE60","#A9DFBF"],
+      ["#E74C3C","#C0392B","#F5B7B1"], ["#9B59B6","#8E44AD","#D7BDE2"],
+      ["#F39C12","#D68910","#FAD7A0"], ["#1ABC9C","#117864","#A2D9CE"],
+      ["#34495E","#1B2631","#ABB2B9"], ["#E67E22","#BA4A00","#F5CBA7"],
+      ["#16A085","#0E6655","#A2D9CE"], ["#D35400","#A04000","#EDBB99"],
+      ["#7F8C8D","#566573","#D5DBDB"], ["#C0392B","#7B241C","#F5B7B1"],
+      ["#2E86C1","#1B4F72","#A9CCE3"], ["#28B463","#196F3D","#A9DFBF"],
+      ["#AF7AC5","#6C3483","#D2B4DE"],
+    ];
+    const phaseColors = { "Root": { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+                          "Default": { fill: "#BDC3C7", stroke: "#95A5A6", collapsedFill: "#ECF0F1" } };
+    (initialJsonData.children || []).forEach((c, i) => {
+      const pal = PALETTE[i % PALETTE.length];
+      phaseColors[c.name] = { fill: pal[0], stroke: pal[1], collapsedFill: pal[2] };
+    });
+
+    const levelSpecificPalettes = {
+      0: { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+      2: { fill: "#6ab04c", stroke: "#508a38", collapsedFill: "#a3d391" },
+      3: { fill: "#f0932b", stroke: "#d0730f", collapsedFill: "#f6c07e" },
+      4: { fill: "#be2edd", stroke: "#a01cb3", collapsedFill: "#e08bf2" },
+      5: { fill: "#00a8ff", stroke: "#007ac1", collapsedFill: "#74d2ff" },
+      6: { fill: "#e55039", stroke: "#c23620", collapsedFill: "#f09a8d" },
+      default: { fill: "#747d8c", stroke: "#57606f", collapsedFill: "#a4b0be" }
+    };
+
+    const svgElement = d3.select("#tree-svg");
+    const initialSvgWidth = +svgElement.attr("width");
+    const initialSvgHeight = +svgElement.attr("height");
+    const margin = { top: 40, right: 120, bottom: 80, left: 450 };
+    let width = initialSvgWidth - margin.left - margin.right;
+    let height = initialSvgHeight - margin.top - margin.bottom;
+    const duration = 500;
+    let nodeCounter = 0;
+    const g = svgElement.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const treemap = d3.tree().nodeSize([40, 0]);
+    let rootNode = d3.hierarchy(treeData, d => d.children);
+    rootNode.x0 = 0;
+    rootNode.y0 = 0;
+
+    if (rootNode.children) {
+      rootNode.children.forEach(d_child => {
+        if (d_child.children) { collapseBranch(d_child); }
+      });
+    }
+    updateTree(rootNode);
+
+    function collapseBranch(d) { if (d.children) { d._children = d.children; d._children.forEach(collapseBranch); d.children = null; } }
+    function expandBranch(d) { if (d._children) { d.children = d._children; d._children = null; } if (d.children) { d.children.forEach(expandBranch); } }
+    window.expandAll = () => { expandBranch(rootNode); updateTree(rootNode); };
+    window.collapseAll = () => { if (rootNode.children) { rootNode.children.forEach(collapseBranch); } updateTree(rootNode); };
+    window.resetView = () => { if (rootNode.children) { rootNode.children.forEach(d_child => { if (d_child.children || d_child._children) { collapseBranch(d_child); } }); } if (rootNode._children && !rootNode.children) { rootNode.children = rootNode._children; rootNode._children = null; } updateTree(rootNode); };
+
+    function updateTree(source) {
+      const treeLayoutData = treemap(rootNode);
+      let nodes = treeLayoutData.descendants();
+      let links = treeLayoutData.descendants().slice(1);
+
+      let minX = 0;
+      let maxX = 0;
+      if (nodes.length > 0) {
+        minX = d3.min(nodes, d => d.x);
+        maxX = d3.max(nodes, d => d.x);
+      }
+
+      let neededHeight = Math.max(initialSvgHeight, maxX - minX + margin.top + margin.bottom + 100);
+      svgElement.transition().duration(duration / 2).attr("height", neededHeight);
+      g.transition().duration(duration / 2).attr("transform", `translate(${margin.left},${margin.top - minX + 40})`);
+
+      nodes.forEach(d => { d.y = d.depth * 400; }); // Adjust horizontal separation if needed
+
+      const node = g.selectAll('g.node').data(nodes, d => d.id || (d.id = ++nodeCounter));
+      const nodeEnter = node.enter().append('g')
+        .attr('class', d => "node" + (d.children || d._children ? " node--internal" : " node--leaf") + (d._children ? " _children" : ""))
+        .attr('transform', d => `translate(${source.y0},${source.x0})`)
+        .on('click', (event, d) => { if (d.children) { d._children = d.children; d.children = null; } else if (d._children) { d.children = d._children; d._children = null; } updateTree(d); })
+        .style('cursor', d => (d.children || d._children) ? 'pointer' : 'default');
+
+      nodeEnter.append('circle').attr('r', 1e-6);
+
+      nodeEnter.append('text')
+        .attr('dy', '.35em')
+        .attr('x', d => d.children || d._children ? -14 : 14)
+        .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
+        .style("fill-opacity", 1e-6)
+        .call(wrapText, 380);
+
+      const nodeUpdate = nodeEnter.merge(node);
+      nodeUpdate.transition().duration(duration)
+        .attr('transform', d => `translate(${d.y},${d.x})`)
+        .attr('class', d => "node" + (d.children ? " node--internal" : " node--leaf") + (d._children ? " node--internal _children" : ""));
+
+      nodeUpdate.select('circle').attr('r', 8.5)
+        .style('fill', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            if (d._children) return palette.collapsedFill;
+            if (d.children) return palette.fill;
+            return "#fff";
+        })
+        .style('stroke', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            return palette.stroke;
+        });
+      nodeUpdate.select('text').style("fill-opacity", 1).call(wrapText, 380);
+
+      const nodeExit = node.exit().transition().duration(duration).attr('transform', d => `translate(${source.y},${source.x})`).remove();
+      nodeExit.select('circle').attr('r', 1e-6);
+      nodeExit.select('text').style('fill-opacity', 1e-6);
+
+      const link = g.selectAll('path.link').data(links, d => d.id);
+      const linkEnter = link.enter().insert('path', "g").attr('class', 'link').attr('d', d => { const o = { x: source.x0, y: source.y0 }; return diagonal(o, o); });
+
+      linkEnter.merge(link).transition().duration(duration).attr('d', d => diagonal(d, d.parent))
+        .style('stroke', d => {
+            const sourceNode = d.parent;
+            if (!sourceNode) return phaseColors.Default.stroke;
+            const l1AncestorName = sourceNode.data.originalStageName;
+            const colorPalette = phaseColors[l1AncestorName] || phaseColors.Default;
+            return colorPalette.stroke;
+        });
+      link.exit().transition().duration(duration).attr('d', d => { const o = { x: source.x, y: source.y }; return diagonal(o, o); }).remove();
+      nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+    }
+
+    function diagonal(s, d) { return `M ${s.y} ${s.x} C ${(s.y + d.y) / 2} ${s.x}, ${(s.y + d.y) / 2} ${d.x}, ${d.y} ${d.x}`; }
+
+    function wrapText(textElements, maxWidth) {
+        const textPartColors = {
+            name: '#343a40',
+            count: '#0056b3'
+        };
+        const countRegex = /(\s\(Total Count: \d+\))$/;
+
+        textElements.each(function () {
+            const textD3 = d3.select(this);
+            const originalNodeText = textD3.datum().data.name;
+            const x = parseFloat(textD3.attr("x") || 0);
+            const initialDy = textD3.attr("dy");
+            const textAnchor = textD3.attr("text-anchor");
+            const lineHeight = 1.1;
+
+            textD3.text(null);
+
+            let namePart = originalNodeText;
+            let countPartText = "";
+
+            const countMatch = originalNodeText.match(countRegex);
+            if (countMatch && originalNodeText.endsWith(countMatch[0])) {
+                namePart = originalNodeText.substring(0, originalNodeText.length - countMatch[0].length).trim();
+                countPartText = countMatch[0].trim();
+            }
+
+            const tokens = [];
+            namePart.split(/\s+/).filter(Boolean).forEach(word => {
+                tokens.push({ text: word, type: 'name' });
+            });
+            if (countPartText) {
+                tokens.push({ text: countPartText, type: 'count' });
+            }
+
+            if (tokens.length === 0 && originalNodeText) {
+                tokens.push({ text: originalNodeText, type: 'name' });
+            }
+
+            let currentTspan = textD3.append("tspan").attr("x", x).attr("dy", initialDy);
+            if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+
+            let lineTokens = [];
+
+            for (let i = 0; i < tokens.length; i++) {
+                const tokenObj = tokens[i];
+
+                lineTokens.push(tokenObj);
+                currentTspan.text(lineTokens.map(t => t.text).join(" "));
+
+                if (currentTspan.node().getComputedTextLength() > maxWidth && lineTokens.length > 1) {
+                    lineTokens.pop();
+
+                    currentTspan.text(null);
+                    lineTokens.forEach((prevToken, idx) => {
+                        currentTspan.append("tspan")
+                            .text((idx > 0 ? " " : "") + prevToken.text)
+                            .style("fill", textPartColors[prevToken.type] || textPartColors.name)
+                            .style("font-weight", prevToken.type === 'count' ? "bold" : "normal");
+                    });
+
+                    lineTokens = [tokenObj];
+                    currentTspan = textD3.append("tspan").attr("x", x).attr("dy", lineHeight + "em");
+                    if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+                }
+            }
+
+            currentTspan.text(null);
+            lineTokens.forEach((token, idx) => {
+                currentTspan.append("tspan")
+                    .text((idx > 0 ? " " : "") + token.text)
+                    .style("fill", textPartColors[token.type] || textPartColors.name)
+                    .style("font-weight", token.type === 'count' ? "bold" : "normal");
+            });
+
+            if (textD3.selectAll("tspan > tspan").empty() && textD3.select("tspan").text().length === 0 && originalNodeText) {
+                let t = textD3.select("tspan");
+                let displayText = originalNodeText;
+                t.text(displayText).style("fill", textPartColors.name);
+                if (t.node() && t.node().getComputedTextLength() > maxWidth && displayText.length > 20) {
+                    let estimatedChars = Math.floor(maxWidth / (t.node().getComputedTextLength()/displayText.length) );
+                    displayText = displayText.substring(0, Math.max(0, estimatedChars - 3)) + "...";
+                    t.text(displayText);
+                }
+            }
+        });
+    }
+  </script>
+</body>
+</html>

@@ -47,21 +47,25 @@ export default function AddBookmarkModal() {
     }, [user, fetchFolders])
 
     useEffect(() => {
-        if (editingBookmark) {
-            setUrl(editingBookmark.url || '')
-            setTitle(editingBookmark.title || '')
-            setDescription(editingBookmark.description || '')
-            setSelectedFolderId(editingBookmark.folder_id || null)
-            // Load existing tags if any
-            fetchBookmarkTags(editingBookmark.id)
-        } else {
-            setUrl('')
-            setTitle('')
-            setDescription('')
-            setTags([])
-            setSelectedFolderId(null)
+        if (showAddModal) {
+            if (editingBookmark) {
+                setUrl(editingBookmark.url || '')
+                setTitle(editingBookmark.title || '')
+                setDescription(editingBookmark.description || '')
+                setSelectedFolderId(editingBookmark.folder_id || null)
+                // Load existing tags if any
+                fetchBookmarkTags(editingBookmark.id)
+            } else {
+                // Reset for new bookmark
+                setUrl('')
+                setTitle('')
+                setDescription('')
+                setTags([])
+                setSelectedFolderId(null)
+                setError('')
+            }
         }
-    }, [editingBookmark, fetchBookmarkTags])
+    }, [showAddModal, editingBookmark, fetchBookmarkTags])
 
     const handleAutoFillMetadata = async () => {
         if (!url) {
