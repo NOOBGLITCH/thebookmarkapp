@@ -71,6 +71,10 @@
     "mtime": 1777636508.065294,
     "hash": "616925205a4eb830761d82490cfff34c"
   },
+  "/home/edith/Pictures/thebookmarkapp/supabase/migrations/19_bulletproof_triggers.sql": {
+    "mtime": 1779946281.1731873,
+    "hash": "6ac26c4393082fd7785029cfe648d66b"
+  },
   "/home/edith/Pictures/thebookmarkapp/supabase/migrations/16_fix_pgcrypto_search_path.sql": {
     "mtime": 1777631020.9103425,
     "hash": "e0b0b585720ca231111593d59e2439e4"
