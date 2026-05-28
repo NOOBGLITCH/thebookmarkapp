@@ -1,7 +1,7 @@
 # Graph Report - thebookmarkapp  (2026-05-28)
 
 ## Corpus Check
-- 73 files · ~48,690 words
+- 73 files · ~49,010 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `83e26a54`
+- Built from commit: `7f6452f7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

@@ -88,6 +88,7 @@ export default function AddBookmarkModal() {
 
     useEffect(() => {
         if (showAddModal) {
+            fetchFolders() // ALWAYS fetch latest folders when opening the modal!
             if (editingBookmark) {
                 setUrl(editingBookmark.url || '')
                 setTitle(editingBookmark.title || '')
@@ -105,7 +106,7 @@ export default function AddBookmarkModal() {
                 setError('')
             }
         }
-    }, [showAddModal, editingBookmark, fetchBookmarkTags])
+    }, [showAddModal, editingBookmark, fetchBookmarkTags, fetchFolders])
 
     const handleAutoFillMetadata = async () => {
         if (!url) {

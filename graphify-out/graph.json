@@ -538,7 +538,7 @@
       "label": "extractMetadata()",
       "file_type": "code",
       "source_file": "src/services/metadataService.js",
-      "source_location": "L364",
+      "source_location": "L387",
       "id": "services_metadataservice_extractmetadata",
       "community": 8,
       "norm_label": "extractmetadata()"
@@ -547,7 +547,7 @@
       "label": "extractTagsFromFolderPath()",
       "file_type": "code",
       "source_file": "src/services/metadataService.js",
-      "source_location": "L433",
+      "source_location": "L456",
       "id": "services_metadataservice_extracttagsfromfolderpath",
       "community": 8,
       "norm_label": "extracttagsfromfolderpath()"
@@ -556,7 +556,7 @@
       "label": "uploadToImgBB()",
       "file_type": "code",
       "source_file": "src/services/metadataService.js",
-      "source_location": "L446",
+      "source_location": "L469",
       "id": "services_metadataservice_uploadtoimgbb",
       "community": 8,
       "norm_label": "uploadtoimgbb()"
@@ -4338,9 +4338,9 @@
       "source_file": "src/pages/BookmarksView.jsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_pages_bookmarksview_jsx",
-      "target": "pages_bookmarksview_buildfoldertree",
-      "confidence_score": 1.0
+      "target": "pages_bookmarksview_buildfoldertree"
     },
     {
       "relation": "contains",
@@ -4348,9 +4348,9 @@
       "source_file": "src/pages/BookmarksView.jsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_pages_bookmarksview_jsx",
-      "target": "pages_bookmarksview_getflattenedfolderoptions",
-      "confidence_score": 1.0
+      "target": "pages_bookmarksview_getflattenedfolderoptions"
     },
     {
       "relation": "contains",
@@ -4369,9 +4369,9 @@
       "source_file": "src/pages/BookmarksView.jsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pages_bookmarksview_getflattenedfolderoptions",
-      "target": "pages_bookmarksview_buildfoldertree",
-      "confidence_score": 1.0
+      "target": "pages_bookmarksview_buildfoldertree"
     },
     {
       "relation": "calls",
@@ -4380,9 +4380,9 @@
       "source_file": "src/pages/BookmarksView.jsx",
       "source_location": "L761",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pages_bookmarksview_bookmarksview",
-      "target": "pages_bookmarksview_getflattenedfolderoptions",
-      "confidence_score": 1.0
+      "target": "pages_bookmarksview_getflattenedfolderoptions"
     },
     {
       "relation": "calls",
@@ -8794,5 +8794,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "83e26a54bcb98d5858dfbc872877eefccb5b0325"
+  "built_at_commit": "7f6452f72ac28968b1a9d7af148039b44d94e04a"
 }

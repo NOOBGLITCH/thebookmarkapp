@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { 
     Plus, Check, X, FolderOpen, Folder, MoreHorizontal, 
-    Link, Lock, Globe, ChevronRight, ChevronDown, Trash2, FolderInput 
+    Link, Lock, Globe, ChevronRight, ChevronDown, Trash2, FolderInput, Edit 
 } from 'lucide-react'
 
 // Helper to build folder tree
@@ -27,16 +27,19 @@ function buildFolderTree(foldersList) {
     return roots
 }
 
-export default function FolderManager({ onSelectFolder }) {
+export default function FolderManager({ onSelectFolder, selectedFolder: activeFolderId }) {
     const { user } = useAuth()
     const [folders, setFolders] = useState([])
     const [showCreateFolder, setShowCreateFolder] = useState(false)
     const [newFolderName, setNewFolderName] = useState('')
     const [newFolderParentId, setNewFolderParentId] = useState('')
-    const [selectedFolder, setSelectedFolder] = useState(null)
     const [menuOpenId, setMenuOpenId] = useState(null)
     const [shareCopiedId, setShareCopiedId] = useState(null)
     const menuRef = useRef(null)
+
+    // For renaming folder
+    const [renamingFolder, setRenamingFolder] = useState(null)
+    const [renameValue, setRenameValue] = useState('')
 
     // For moving folder
     const [movingFolder, setMovingFolder] = useState(null)
@@ -182,8 +185,31 @@ export default function FolderManager({ onSelectFolder }) {
     }
 
     const handleSelectFolderInternal = (folderId) => {
-        setSelectedFolder(folderId)
         if (onSelectFolder) onSelectFolder(folderId)
+    }
+
+    const handleRenameFolder = async () => {
+        if (!renamingFolder || !renameValue.trim()) return
+
+        try {
+            const { error } = await supabase
+                .from('folders')
+                .update({ name: renameValue.trim() })
+                .eq('id', renamingFolder.id)
+                .eq('user_id', user.id)
+
+            if (error) throw error
+
+            setFolders(prev => prev.map(f => f.id === renamingFolder.id ? { ...f, name: renameValue.trim() } : f))
+            setRenamingFolder(null)
+            
+            // Sync with bookmarks and folders globally
+            window.dispatchEvent(new CustomEvent('refreshFolders'))
+            window.dispatchEvent(new CustomEvent('refreshBookmarks'))
+        } catch (error) {
+            console.error('Error renaming folder:', error)
+            alert('Failed to rename folder: ' + error.message)
+        }
     }
 
     // Helper to check if childId is a descendant of parentId
@@ -285,7 +311,7 @@ export default function FolderManager({ onSelectFolder }) {
             setMenuOpenId(null)
             
             // If the deleted folder or any descendant was selected, deselect it
-            if (selectedFolder === folder.id || isDescendant(folders, folder.id, selectedFolder)) {
+            if (activeFolderId === folder.id || isDescendant(folders, folder.id, activeFolderId)) {
                 handleSelectFolderInternal(null)
             }
 
@@ -300,7 +326,7 @@ export default function FolderManager({ onSelectFolder }) {
 
     // Recursive rendering function for folders tree
     const renderFolderNode = (node, depth = 0) => {
-        const isSelected = selectedFolder === node.id
+        const isSelected = activeFolderId === node.id
         const isExpanded = !!expandedFolders[node.id]
         const hasChildren = node.children && node.children.length > 0
 
@@ -308,7 +334,7 @@ export default function FolderManager({ onSelectFolder }) {
             <div key={node.id} className="flex flex-col">
                 <div 
                     style={{ paddingLeft: `${depth * 12 + 8}px` }}
-                    className={`flex items-center justify-between py-1.5 pr-2 rounded transition text-sm ${isSelected ? 'bg-accent/20 text-accent font-medium' : 'text-secondaryText hover:bg-gray-800 hover:text-primaryText'}`}
+                    className={`flex items-center justify-between py-1.5 pr-2 rounded transition text-sm relative group ${isSelected ? 'bg-accent/20 text-accent font-medium' : 'text-secondaryText hover:bg-gray-800 hover:text-primaryText'}`}
                 >
                     <div className="flex items-center gap-1.5 flex-1 min-w-0">
                         {/* Chevron expand/collapse arrow */}
@@ -346,48 +372,56 @@ export default function FolderManager({ onSelectFolder }) {
                     >
                         <MoreHorizontal className="w-4 h-4" />
                     </button>
+
+                    {/* Subfolder Menu */}
+                    {menuOpenId === node.id && (
+                        <div ref={menuRef} className="absolute right-2 top-full mt-1 w-48 bg-surface border border-gray-700 rounded shadow-xl z-50 py-1">
+                            <button
+                                onClick={(e) => copyFolderPublicLink(node, e)}
+                                className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
+                            >
+                                <Link className="w-4 h-4" />
+                                {shareCopiedId === node.id ? 'Copied!' : 'Copy public link'}
+                            </button>
+                            
+                            <button
+                                onClick={(e) => toggleFolderVisibility(node, e)}
+                                className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
+                            >
+                                {(node.visibility === 'public' || node.is_public) ? (
+                                    <Lock className="w-4 h-4" />
+                                ) : (
+                                    <Globe className="w-4 h-4" />
+                                )}
+                                {(node.visibility === 'public' || node.is_public) ? 'Make Private' : 'Make Public'}
+                            </button>
+
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setRenamingFolder(node); setRenameValue(node.name); setMenuOpenId(null); }}
+                                className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2 border-t border-gray-800"
+                            >
+                                <Edit className="w-4 h-4" />
+                                Rename Folder
+                            </button>
+
+                            <button
+                                onClick={(e) => openMoveModal(node, e)}
+                                className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
+                            >
+                                <FolderInput className="w-4 h-4" />
+                                Move Folder
+                            </button>
+
+                            <button
+                                onClick={(e) => handleDeleteFolder(node, e)}
+                                className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800 flex items-center gap-2 border-t border-gray-800"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                Delete Folder
+                            </button>
+                        </div>
+                    )}
                 </div>
-
-                {/* Subfolder Menu */}
-                {menuOpenId === node.id && (
-                    <div ref={menuRef} className="absolute right-2 mt-8 w-48 bg-surface border border-gray-700 rounded shadow-xl z-50 py-1">
-                        <button
-                            onClick={(e) => copyFolderPublicLink(node, e)}
-                            className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
-                        >
-                            <Link className="w-4 h-4" />
-                            {shareCopiedId === node.id ? 'Copied!' : 'Copy public link'}
-                        </button>
-                        
-                        <button
-                            onClick={(e) => toggleFolderVisibility(node, e)}
-                            className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
-                        >
-                            {(node.visibility === 'public' || node.is_public) ? (
-                                <Lock className="w-4 h-4" />
-                            ) : (
-                                <Globe className="w-4 h-4" />
-                            )}
-                            {(node.visibility === 'public' || node.is_public) ? 'Make Private' : 'Make Public'}
-                        </button>
-
-                        <button
-                            onClick={(e) => openMoveModal(node, e)}
-                            className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2 border-t border-gray-800"
-                        >
-                            <FolderInput className="w-4 h-4" />
-                            Move Folder
-                        </button>
-
-                        <button
-                            onClick={(e) => handleDeleteFolder(node, e)}
-                            className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800 flex items-center gap-2"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                            Delete Folder
-                        </button>
-                    </div>
-                )}
 
                 {/* Recursively render child folder nodes */}
                 {isExpanded && hasChildren && (
@@ -407,7 +441,7 @@ export default function FolderManager({ onSelectFolder }) {
                 <h3 className="text-xs font-semibold text-secondaryText uppercase tracking-wide">Folders</h3>
                 <button
                     onClick={() => {
-                        setNewFolderParentId(selectedFolder || '')
+                        setNewFolderParentId(activeFolderId || '')
                         setShowCreateFolder(true)
                     }}
                     className="text-secondaryText hover:text-accent transition"
@@ -475,7 +509,7 @@ export default function FolderManager({ onSelectFolder }) {
                     <li>
                         <button
                             onClick={() => handleSelectFolderInternal(null)}
-                            className={`w-full text-left px-3 py-2 rounded transition text-sm flex items-center gap-2 ${!selectedFolder
+                            className={`w-full text-left px-3 py-2 rounded transition text-sm flex items-center gap-2 ${!activeFolderId
                                 ? 'bg-accent/20 text-accent font-medium'
                                 : 'text-secondaryText hover:bg-gray-800 hover:text-primaryText'
                                 }`}
@@ -526,6 +560,44 @@ export default function FolderManager({ onSelectFolder }) {
                                 className="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded transition text-sm font-semibold"
                             >
                                 Move Folder
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Rename Folder Modal */}
+            {renamingFolder && (
+                <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4 animate-fadeIn">
+                    <div className="bg-surface rounded-lg max-w-sm w-full p-6 border border-gray-800 shadow-2xl">
+                        <h3 className="text-lg font-bold text-primaryText mb-2">Rename Folder</h3>
+                        <p className="text-sm text-secondaryText mb-4">
+                            Enter a new name for <strong className="text-primaryText">"{renamingFolder.name}"</strong>:
+                        </p>
+                        
+                        <div className="mb-6">
+                            <input
+                                type="text"
+                                value={renameValue}
+                                onChange={(e) => setRenameValue(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleRenameFolder()}
+                                className="w-full px-3 py-2 bg-background border border-gray-700 rounded text-primaryText focus:outline-none focus:border-accent"
+                                autoFocus
+                            />
+                        </div>
+                        
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setRenamingFolder(null)}
+                                className="px-4 py-2 bg-background hover:bg-gray-800 text-primaryText border border-gray-700 rounded transition text-sm"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleRenameFolder}
+                                className="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded transition text-sm font-semibold"
+                            >
+                                Rename
                             </button>
                         </div>
                     </div>

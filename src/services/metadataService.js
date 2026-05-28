@@ -345,13 +345,36 @@ async function fetchURLContent(url) {
         }
     })
 
-    // Race all proxies and return first success
-    try {
-        // Fallback for very old browsers or environments without Promise.any
-        if (!Promise.any) {
-            return await Promise.race(proxyPromises)
+    // Helper to mimic Promise.any robustly across all browsers and environments
+    const promiseAny = (promises) => {
+        if (Promise.any) {
+            return Promise.any(promises)
         }
-        return await Promise.any(proxyPromises)
+        return new Promise((resolve, reject) => {
+            let rejectedCount = 0
+            const errors = []
+            if (promises.length === 0) {
+                reject(new Error('No promises provided'))
+                return
+            }
+            promises.forEach((p, index) => {
+                Promise.resolve(p).then(resolve).catch((err) => {
+                    errors[index] = err
+                    rejectedCount++
+                    if (rejectedCount === promises.length) {
+                        const aggError = typeof AggregateError !== 'undefined'
+                            ? new AggregateError(errors, 'All promises were rejected')
+                            : new Error('All promises were rejected')
+                        reject(aggError)
+                    }
+                })
+            })
+        })
+    }
+
+    // Query all proxies in parallel and return the first success
+    try {
+        return await promiseAny(proxyPromises)
     } catch (error) {
         console.error('All proxies failed:', error)
         throw new Error('Unable to reach the website. This might be due to CORS restrictions or the site blocking proxies. Please enter details manually.')
