@@ -382,13 +382,15 @@ export default function FolderManager({ onSelectFolder, selectedFolder: activeFo
                     {/* Subfolder Menu */}
                     {menuOpenId === node.id && (
                         <div ref={menuRef} className="absolute right-2 top-full mt-1 w-48 bg-surface border border-gray-700 rounded shadow-xl z-50 py-1">
-                            <button
-                                onClick={(e) => copyFolderPublicLink(node, e)}
-                                className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
-                            >
-                                <Link className="w-4 h-4" />
-                                {shareCopiedId === node.id ? 'Copied!' : 'Copy public link'}
-                            </button>
+                            {(node.visibility === 'public' || node.is_public) && (
+                                <button
+                                    onClick={(e) => copyFolderPublicLink(node, e)}
+                                    className="w-full text-left px-4 py-2 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2"
+                                >
+                                    <Link className="w-4 h-4" />
+                                    {shareCopiedId === node.id ? 'Copied!' : 'Copy public link'}
+                                </button>
+                            )}
                             
                             <button
                                 onClick={(e) => toggleFolderVisibility(node, e)}
