@@ -310,10 +310,28 @@
       "norm_label": "bookmarksview.jsx"
     },
     {
+      "label": "buildFolderTree()",
+      "file_type": "code",
+      "source_file": "src/pages/BookmarksView.jsx",
+      "source_location": "L8",
+      "id": "pages_bookmarksview_buildfoldertree",
+      "community": 0,
+      "norm_label": "buildfoldertree()"
+    },
+    {
+      "label": "getFlattenedFolderOptions()",
+      "file_type": "code",
+      "source_file": "src/pages/BookmarksView.jsx",
+      "source_location": "L28",
+      "id": "pages_bookmarksview_getflattenedfolderoptions",
+      "community": 0,
+      "norm_label": "getflattenedfolderoptions()"
+    },
+    {
       "label": "BookmarksView()",
       "file_type": "code",
       "source_file": "src/pages/BookmarksView.jsx",
-      "source_location": "L7",
+      "source_location": "L47",
       "id": "pages_bookmarksview_bookmarksview",
       "community": 0,
       "norm_label": "bookmarksview()"
@@ -4318,11 +4336,53 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/pages/BookmarksView.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_pages_bookmarksview_jsx",
+      "target": "pages_bookmarksview_buildfoldertree",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/BookmarksView.jsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "src_pages_bookmarksview_jsx",
+      "target": "pages_bookmarksview_getflattenedfolderoptions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/BookmarksView.jsx",
       "source_location": "L7",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_pages_bookmarksview_jsx",
       "target": "pages_bookmarksview_bookmarksview"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/BookmarksView.jsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "pages_bookmarksview_getflattenedfolderoptions",
+      "target": "pages_bookmarksview_buildfoldertree",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/BookmarksView.jsx",
+      "source_location": "L761",
+      "weight": 1.0,
+      "source": "pages_bookmarksview_bookmarksview",
+      "target": "pages_bookmarksview_getflattenedfolderoptions",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -4809,9 +4869,9 @@
       "source_file": "src/services/metadataService.js",
       "source_location": "L264",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_services_metadataservice_js",
-      "target": "services_metadataservice_fetchyoutubemetadata",
-      "confidence_score": 1.0
+      "target": "services_metadataservice_fetchyoutubemetadata"
     },
     {
       "relation": "contains",
@@ -4981,9 +5041,9 @@
       "source_file": "src/services/metadataService.js",
       "source_location": "L374",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_metadataservice_extractmetadata",
-      "target": "services_metadataservice_fetchyoutubemetadata",
-      "confidence_score": 1.0
+      "target": "services_metadataservice_fetchyoutubemetadata"
     },
     {
       "relation": "calls",
@@ -5034,9 +5094,9 @@
       "source_file": "src/components/FolderManager.jsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_foldermanager_jsx",
-      "target": "components_foldermanager_buildfoldertree",
-      "confidence_score": 1.0
+      "target": "components_foldermanager_buildfoldertree"
     },
     {
       "relation": "contains",
@@ -5066,9 +5126,9 @@
       "source_file": "src/components/FolderManager.jsx",
       "source_location": "L402",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_foldermanager_foldermanager",
-      "target": "components_foldermanager_buildfoldertree",
-      "confidence_score": 1.0
+      "target": "components_foldermanager_buildfoldertree"
     },
     {
       "relation": "contains",
@@ -5107,9 +5167,9 @@
       "source_file": "src/components/AddBookmarkModal.jsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_addbookmarkmodal_jsx",
-      "target": "components_addbookmarkmodal_buildfoldertree",
-      "confidence_score": 1.0
+      "target": "components_addbookmarkmodal_buildfoldertree"
     },
     {
       "relation": "contains",
@@ -5117,9 +5177,9 @@
       "source_file": "src/components/AddBookmarkModal.jsx",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_components_addbookmarkmodal_jsx",
-      "target": "components_addbookmarkmodal_getflattenedfolderoptions",
-      "confidence_score": 1.0
+      "target": "components_addbookmarkmodal_getflattenedfolderoptions"
     },
     {
       "relation": "contains",
@@ -5138,9 +5198,9 @@
       "source_file": "src/components/AddBookmarkModal.jsx",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_addbookmarkmodal_getflattenedfolderoptions",
-      "target": "components_addbookmarkmodal_buildfoldertree",
-      "confidence_score": 1.0
+      "target": "components_addbookmarkmodal_buildfoldertree"
     },
     {
       "relation": "calls",
@@ -5149,9 +5209,9 @@
       "source_file": "src/components/AddBookmarkModal.jsx",
       "source_location": "L375",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_addbookmarkmodal_addbookmarkmodal",
-      "target": "components_addbookmarkmodal_getflattenedfolderoptions",
-      "confidence_score": 1.0
+      "target": "components_addbookmarkmodal_getflattenedfolderoptions"
     },
     {
       "relation": "contains",
@@ -8734,5 +8794,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4ae288416ba4bf84090d237864e3e322ef251fd4"
+  "built_at_commit": "83e26a54bcb98d5858dfbc872877eefccb5b0325"
 }

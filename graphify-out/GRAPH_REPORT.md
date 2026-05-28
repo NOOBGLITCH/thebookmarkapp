@@ -1,16 +1,16 @@
 # Graph Report - thebookmarkapp  (2026-05-28)
 
 ## Corpus Check
-- 72 files · ~47,476 words
+- 73 files · ~48,690 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 388 nodes · 508 edges · 26 communities (25 shown, 1 thin omitted)
+- 390 nodes · 512 edges · 26 communities (25 shown, 1 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4ae28841`
+- Built from commit: `83e26a54`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -65,7 +65,7 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.09
-Nodes (24): AddBookmarkModal(), buildFolderTree(), getFlattenedFolderOptions(), buildFolderTree(), FolderManager(), ProtectedRoute(), RedirectIfAuthenticated(), SearchBar() (+16 more)
+Nodes (26): AddBookmarkModal(), buildFolderTree(), getFlattenedFolderOptions(), buildFolderTree(), FolderManager(), ProtectedRoute(), RedirectIfAuthenticated(), SearchBar() (+18 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.06

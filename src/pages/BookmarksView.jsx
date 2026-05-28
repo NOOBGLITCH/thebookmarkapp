@@ -4,6 +4,46 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import SearchBar from '../components/SearchBar'
 
+// Helper to build folder tree
+function buildFolderTree(foldersList) {
+    const map = {}
+    const roots = []
+    
+    foldersList.forEach(folder => {
+        map[folder.id] = { ...folder, children: [] }
+    })
+    
+    foldersList.forEach(folder => {
+        const mapped = map[folder.id]
+        if (folder.parent_id && map[folder.parent_id]) {
+            map[folder.parent_id].children.push(mapped)
+        } else {
+            roots.push(mapped)
+        }
+    })
+    
+    return roots
+}
+
+function getFlattenedFolderOptions(foldersList) {
+    const tree = buildFolderTree(foldersList)
+    const options = []
+    
+    const traverse = (node, depth = 0) => {
+        options.push({
+            id: node.id,
+            name: node.name,
+            depth: depth
+        })
+        if (node.children) {
+            node.children.forEach(child => traverse(child, depth + 1))
+        }
+    }
+    
+    tree.forEach(rootNode => traverse(rootNode, 0))
+    return options
+}
+
 export default function BookmarksView() {
     const { user } = useAuth()
     const { openEditModal, openAddModal, refreshTrigger } = useBookmarks()
@@ -19,6 +59,65 @@ export default function BookmarksView() {
         const saved = localStorage.getItem('bookmarkFavorites')
         return saved ? JSON.parse(saved) : []
     })
+
+    const [contextMenu, setContextMenu] = useState(null) // { x, y, bookmark }
+    const [isMoveModalOpen, setIsMoveModalOpen] = useState(false)
+    const [bookmarksToMove, setBookmarksToMove] = useState([])
+    const [moveTargetFolderId, setMoveTargetFolderId] = useState('')
+
+    // Close context menu on left click anywhere
+    useEffect(() => {
+        const handleCloseMenu = () => setContextMenu(null)
+        window.addEventListener('click', handleCloseMenu)
+        return () => window.removeEventListener('click', handleCloseMenu)
+    }, [])
+
+    const handleContextMenu = (e, bookmark) => {
+        e.preventDefault()
+        e.stopPropagation()
+        
+        const menuWidth = 192 // w-48 is 12rem = 192px
+        const menuHeight = 180
+        
+        let x = e.clientX
+        let y = e.clientY
+        
+        if (x + menuWidth > window.innerWidth) {
+            x = window.innerWidth - menuWidth - 10
+        }
+        if (y + menuHeight > window.innerHeight) {
+            y = window.innerHeight - menuHeight - 10
+        }
+        
+        setContextMenu({ x, y, bookmark })
+    }
+
+    const handleBulkMove = async () => {
+        if (bookmarksToMove.length === 0) return
+
+        try {
+            const folderIdVal = moveTargetFolderId || null
+            const { error } = await supabase
+                .from('bookmarks')
+                .update({ folder_id: folderIdVal })
+                .in('id', bookmarksToMove)
+                .eq('user_id', user.id)
+
+            if (error) throw error
+
+            setIsMoveModalOpen(false)
+            setBookmarksToMove([])
+            setMoveTargetFolderId('')
+            setSelectedBookmarks([]) // Clear selections if bulk moved
+            
+            // Refresh
+            fetchBookmarks()
+            window.dispatchEvent(new CustomEvent('refreshFolders'))
+        } catch (err) {
+            console.error('Bulk move failed:', err)
+            alert('Failed to move bookmarks: ' + err.message)
+        }
+    }
 
     const fetchFolders = useCallback(async () => {
         if (!user) return
@@ -353,13 +452,26 @@ export default function BookmarksView() {
                                     <>
                                         <button
                                             onClick={deselectAll}
-                                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition text-sm"
+                                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition text-sm font-medium"
                                         >
                                             Deselect All
                                         </button>
                                         <button
+                                            onClick={() => {
+                                                setBookmarksToMove(selectedBookmarks)
+                                                setMoveTargetFolderId('')
+                                                setIsMoveModalOpen(true)
+                                            }}
+                                            className="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg transition text-sm flex items-center gap-2 font-medium"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                            </svg>
+                                            Move ({selectedBookmarks.length})
+                                        </button>
+                                        <button
                                             onClick={handleBulkDelete}
-                                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition text-sm flex items-center gap-2"
+                                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition text-sm flex items-center gap-2 font-medium"
                                         >
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -415,7 +527,8 @@ export default function BookmarksView() {
                                 <div
                                     key={bookmark.id}
                                     onClick={() => toggleBookmarkSelection(bookmark.id)}
-                                    className={`bg-surface rounded-lg overflow-hidden border transition group relative cursor-pointer ${selectedBookmarks.includes(bookmark.id)
+                                    onContextMenu={(e) => handleContextMenu(e, bookmark)}
+                                    className={`bg-surface rounded-lg overflow-hidden border transition group relative cursor-pointer select-none ${selectedBookmarks.includes(bookmark.id)
                                         ? 'border-accent ring-2 ring-accent/50 bg-accent/5'
                                         : selectedTag && bookmark.tags?.includes(selectedTag)
                                             ? 'border-accent ring-2 ring-accent/20'
@@ -565,6 +678,114 @@ export default function BookmarksView() {
                     )}
                 </div>
             </div>
+
+            {/* Right-click Context Menu */}
+            {contextMenu && (
+                <div 
+                    className="fixed bg-surface border border-gray-700 rounded shadow-2xl z-50 py-1 w-48 text-left animate-fadeIn"
+                    style={{ top: `${contextMenu.y}px`, left: `${contextMenu.x}px` }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <button
+                        onClick={() => {
+                            openEditModal(contextMenu.bookmark)
+                            setContextMenu(null)
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2 transition"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        Edit Bookmark
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            setBookmarksToMove([contextMenu.bookmark.id])
+                            setMoveTargetFolderId(contextMenu.bookmark.folder_id || '')
+                            setIsMoveModalOpen(true)
+                            setContextMenu(null)
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2 border-t border-gray-800 transition"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        Move to Folder
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            copyBookmarkPublicLink(contextMenu.bookmark)
+                            setContextMenu(null)
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-primaryText hover:bg-gray-800 flex items-center gap-2 transition"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                        Copy Share Link
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            deleteBookmark(contextMenu.bookmark.id)
+                            setContextMenu(null)
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-gray-800 flex items-center gap-2 border-t border-gray-800 transition"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete Bookmark
+                    </button>
+                </div>
+            )}
+
+            {/* Move Bookmark Modal */}
+            {isMoveModalOpen && (
+                <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4 animate-fadeIn">
+                    <div className="bg-surface rounded-lg max-w-sm w-full p-6 border border-gray-800 shadow-2xl">
+                        <h3 className="text-lg font-bold text-primaryText mb-2">Move Bookmarks</h3>
+                        <p className="text-sm text-secondaryText mb-4">
+                            Move {bookmarksToMove.length} item{bookmarksToMove.length !== 1 ? 's' : ''} to specified folder:
+                        </p>
+                        
+                        <div className="mb-6">
+                            <select
+                                value={moveTargetFolderId}
+                                onChange={(e) => setMoveTargetFolderId(e.target.value)}
+                                className="w-full px-3 py-2 bg-background border border-gray-700 rounded text-primaryText focus:outline-none focus:border-accent"
+                            >
+                                <option value="">[Root Level] (No folder)</option>
+                                {getFlattenedFolderOptions(folders).map(f => (
+                                    <option key={f.id} value={f.id}>
+                                        {'\u00A0'.repeat(f.depth * 3)}{f.depth > 0 ? '↳ ' : ''}{f.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => {
+                                    setIsMoveModalOpen(false)
+                                    setBookmarksToMove([])
+                                }}
+                                className="px-4 py-2 bg-background hover:bg-gray-800 text-primaryText border border-gray-700 rounded transition text-sm"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleBulkMove}
+                                className="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded transition text-sm font-semibold"
+                            >
+                                Move Bookmarks
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
