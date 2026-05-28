@@ -24,7 +24,6 @@ DECLARE
     b_folder TEXT;
     b_tags TEXT[];
     folder_id_val UUID;
-    tag_ids UUID[];
     tag_name TEXT;
     b_id UUID;
     inserted INT := 0;
@@ -49,27 +48,58 @@ BEGIN
         b_title := COALESCE(NULLIF(trim(item->>'title'), ''), b_url);
         b_desc := item->>'description';
         b_folder := item->>'folder_name';
-        b_tags := ARRAY(SELECT jsonb_array_elements_text(COALESCE(item->'tag_names', '[]'::jsonb)));
+        
+        -- Safe conversion to array of text from jsonb
+        IF item->'tag_names' IS NOT NULL AND jsonb_typeof(item->'tag_names') = 'array' THEN
+            b_tags := ARRAY(SELECT jsonb_array_elements_text(item->'tag_names'));
+        ELSE
+            b_tags := ARRAY[]::TEXT[];
+        END IF;
 
         IF b_url IS NULL OR length(trim(b_url)) = 0 THEN
             skipped := skipped + 1;
             CONTINUE;
         END IF;
 
-        -- Resolve folder (create if missing, root only for simplicity - max depth enforced by trigger)
+        -- Resolve folder path recursively (creating nested folders split by '/')
         folder_id_val := NULL;
         IF b_folder IS NOT NULL AND length(trim(b_folder)) > 0 THEN
-            SELECT id INTO folder_id_val FROM folders WHERE user_id = uid AND name = trim(b_folder) AND parent_id IS NULL LIMIT 1;
-            IF folder_id_val IS NULL THEN
-                INSERT INTO folders (user_id, name, parent_id) VALUES (uid, trim(b_folder), NULL) RETURNING id INTO folder_id_val;
-            END IF;
+            DECLARE
+                parts TEXT[];
+                part TEXT;
+                curr_parent_id UUID := NULL;
+            BEGIN
+                -- Split by '/' or ' / ' and trim parts
+                SELECT string_to_array(b_folder, '/') INTO parts;
+                FOREACH part IN ARRAY parts LOOP
+                    part := trim(part);
+                    IF length(part) > 0 THEN
+                        -- Find or create folder at current level
+                        SELECT id INTO folder_id_val FROM folders 
+                        WHERE user_id = uid 
+                          AND name = part 
+                          AND ((parent_id IS NULL AND curr_parent_id IS NULL) OR parent_id = curr_parent_id) 
+                        LIMIT 1;
+                        
+                        IF folder_id_val IS NULL THEN
+                            INSERT INTO folders (user_id, name, parent_id) 
+                            VALUES (uid, part, curr_parent_id) 
+                            RETURNING id INTO folder_id_val;
+                        END IF;
+                        curr_parent_id := folder_id_val;
+                    END IF;
+                END LOOP;
+            END;
         END IF;
 
         -- Dedupe: skip or update by URL
         IF dedupe THEN
             SELECT id INTO b_id FROM bookmarks WHERE user_id = uid AND url = b_url LIMIT 1;
             IF b_id IS NOT NULL THEN
-                UPDATE bookmarks SET title = b_title, description = b_desc, folder_id = folder_id_val, updated_at = NOW() WHERE id = b_id;
+                UPDATE bookmarks 
+                SET title = b_title, description = b_desc, folder_id = folder_id_val, updated_at = NOW() 
+                WHERE id = b_id;
+                
                 -- Sync tags for existing bookmark (merge mode: don't delete existing)
                 FOREACH tag_name IN ARRAY b_tags LOOP
                     IF tag_name IS NOT NULL AND length(trim(tag_name)) > 0 THEN

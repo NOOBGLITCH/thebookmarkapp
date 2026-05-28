@@ -29,19 +29,119 @@ export default function Settings() {
     const buildImportPayloadFromHtml = (text) => {
         const parser = new DOMParser()
         const doc = parser.parseFromString(text, 'text/html')
-        const links = Array.from(doc.getElementsByTagName('a'))
-        const bookmarks = links
-            .filter((link) => link.href && link.href.startsWith('http'))
-            .map((link) => ({
-                url: link.href,
-                title: (link.textContent || '').trim() || link.href,
-                description: 'Imported'
-            }))
+        const bookmarks = []
+
+        const walk = (node, currentFolders = []) => {
+            let child = node.firstChild
+            while (child) {
+                if (child.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = child.tagName.toUpperCase()
+                    if (tagName === 'H3') {
+                        const folderName = (child.textContent || '').trim()
+                        if (folderName) {
+                            currentFolders.push(folderName)
+                        }
+                    } else if (tagName === 'A') {
+                        const url = child.getAttribute('href')
+                        if (url && url.startsWith('http')) {
+                            const title = (child.textContent || '').trim() || url
+                            const descriptionAttr = child.getAttribute('description') || child.getAttribute('comment') || ''
+                            const tagsAttr = child.getAttribute('tags') || child.getAttribute('tags_list') || ''
+                            const tagNames = tagsAttr
+                                ? tagsAttr.split(',').map(t => t.trim()).filter(Boolean)
+                                : []
+                            
+                            const folderName = currentFolders.length > 0 ? currentFolders.join(' / ') : null
+
+                            bookmarks.push({
+                                url,
+                                title,
+                                description: descriptionAttr || 'Imported',
+                                folder_name: folderName,
+                                tag_names: tagNames
+                            })
+                        }
+                    }
+
+                    if (tagName === 'DL') {
+                        walk(child, currentFolders)
+                        currentFolders.pop()
+                    } else {
+                        walk(child, currentFolders)
+                    }
+                }
+                child = child.nextSibling
+            }
+        }
+
+        const root = doc.body || doc.documentElement
+        walk(root, [])
         return { bookmarks, options: { dedupe_by_url: true } }
     }
 
     const buildImportPayloadFromJson = (text) => {
         const parsed = JSON.parse(text)
+        
+        // If it is a full FlowMark backup snapshot
+        if (parsed && parsed.folders && parsed.bookmarks) {
+            // Build folder id -> nested folder path map
+            const folderMap = {}
+            const getFolderPath = (folderId) => {
+                if (folderMap[folderId]) return folderMap[folderId]
+                const folder = parsed.folders.find(f => f.id === folderId)
+                if (!folder) return ''
+                if (folder.parent_id) {
+                    const parentPath = getFolderPath(folder.parent_id)
+                    folderMap[folderId] = parentPath ? `${parentPath} / ${folder.name}` : folder.name
+                } else {
+                    folderMap[folderId] = folder.name
+                }
+                return folderMap[folderId]
+            }
+
+            // Build tag_id -> tag name map
+            const tagMap = {}
+            if (parsed.tags) {
+                parsed.tags.forEach(t => {
+                    if (t.id && t.name) {
+                        tagMap[t.id] = t.name
+                    }
+                })
+            }
+
+            // Build bookmark_id -> tag_names array map
+            const bookmarkTagsMap = {}
+            if (parsed.bookmark_tags) {
+                parsed.bookmark_tags.forEach(bt => {
+                    if (bt.bookmark_id && bt.tag_id) {
+                        if (!bookmarkTagsMap[bt.bookmark_id]) {
+                            bookmarkTagsMap[bt.bookmark_id] = []
+                        }
+                        const tagName = tagMap[bt.tag_id]
+                        if (tagName) {
+                            bookmarkTagsMap[bt.bookmark_id].push(tagName)
+                        }
+                    }
+                })
+            }
+
+            // Reconstruct full bookmarks payload
+            const bookmarks = parsed.bookmarks.map((b) => {
+                const folderPath = b.folder_id ? getFolderPath(b.folder_id) : null
+                const tags = bookmarkTagsMap[b.id] || []
+                return {
+                    url: b.url,
+                    title: b.title || b.url,
+                    description: b.description || '',
+                    folder_name: folderPath,
+                    tag_names: tags
+                }
+            }).filter((b) => b.url)
+
+            return { bookmarks, options: { dedupe_by_url: true } }
+        }
+
+        // Standard bookmark JSON file import
         const list = Array.isArray(parsed) ? parsed : parsed.bookmarks || []
         const bookmarks = list.map((b) => ({
             url: b.url || b.href,

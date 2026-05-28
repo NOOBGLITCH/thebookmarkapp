@@ -52,8 +52,8 @@
     "hash": "e16f85fe734435a7d8311f9aafb5edc7"
   },
   "/home/edith/Pictures/thebookmarkapp/supabase/migrations/13_import_export_backup_rpcs.sql": {
-    "mtime": 1777636572.9750028,
-    "hash": "7117c35161a4a77e3be0bd5a2b7b73cb"
+    "mtime": 1779946142.413533,
+    "hash": "d96ebf1b9d459f3914ad4c1c0abce706"
   },
   "/home/edith/Pictures/thebookmarkapp/supabase/migrations/15_fix_delete_cleanup.sql": {
     "mtime": 1777631020.9103425,
@@ -112,8 +112,8 @@
     "hash": "9eb5badf07a1ff048c1dd562a937ddb1"
   },
   "/home/edith/Pictures/thebookmarkapp/src/pages/Settings.jsx": {
-    "mtime": 1777631020.9071956,
-    "hash": "b476474a68c89d7fcca401b771ba5064"
+    "mtime": 1779946149.2707715,
+    "hash": "e750b94d97b27dcb89fe1e82ebc9f718"
   },
   "/home/edith/Pictures/thebookmarkapp/src/pages/BookmarksView.jsx": {
     "mtime": 1779945084.282705,
