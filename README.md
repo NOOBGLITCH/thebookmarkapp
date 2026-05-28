@@ -70,6 +70,17 @@ Built with modern, high-performance technologies:
 
 ---
 
+## 📝 Changelog
+
+### Recent Updates (May 2026)
+- **Robust Folder Structure**: Hardened database triggers (`check_folder_depth`) to prevent deep grandchild nested loops.
+- **Smart Tag Garbage Collection**: Added an automated database trigger (`trigger_cleanup_orphaned_tags`) to prune empty tags whenever bookmarks are deleted.
+- **Strict Privacy Controls**: Restructured sharing rules. Private folders, tags, and bookmarks can no longer be shared, and making a resource private immediately revokes all existing public URLs.
+- **Context Menu Upgrades**: Added "Open in New Tab" and "Copy Link" to the bookmark right-click menu, complete with glassmorphic toast success notifications.
+- **Production Indexing**: Migrated new SQL indexes (`idx_bookmarks_user_folder`, `idx_folders_user_parent`) to optimize rendering speed for nested hierarchies and tag filters.
+
+---
+
 ## 🚀 Deployment
 
 The easiest way to deploy is with **Vercel**.
