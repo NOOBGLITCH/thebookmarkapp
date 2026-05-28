@@ -112,8 +112,8 @@
     "hash": "b476474a68c89d7fcca401b771ba5064"
   },
   "/home/edith/Pictures/thebookmarkapp/src/pages/BookmarksView.jsx": {
-    "mtime": 1777631020.9063942,
-    "hash": "f8308788f9dc3f91f87683961c1f3672"
+    "mtime": 1779944448.4388359,
+    "hash": "9a43377047d42e77152a206e5c261227"
   },
   "/home/edith/Pictures/thebookmarkapp/src/pages/Landing.jsx": {
     "mtime": 1777631020.9071956,
@@ -128,16 +128,16 @@
     "hash": "de6f210fc69f2513d75fa89f2cf3fdff"
   },
   "/home/edith/Pictures/thebookmarkapp/src/services/metadataService.js": {
-    "mtime": 1777631020.9083943,
-    "hash": "b3122d3930dc14a53bf20696aa137358"
+    "mtime": 1778739355.4860957,
+    "hash": "d7cb1f41be7221e1cae9ac523260f4f3"
   },
   "/home/edith/Pictures/thebookmarkapp/src/components/SearchBar.jsx": {
     "mtime": 1777631020.905527,
     "hash": "5d06608d320bfdd16cb613ab8b95484e"
   },
   "/home/edith/Pictures/thebookmarkapp/src/components/FolderManager.jsx": {
-    "mtime": 1777631020.905527,
-    "hash": "3d2669c35990b613064504f996fdd763"
+    "mtime": 1779944415.91735,
+    "hash": "bc35092bd9a1730c53aee8727632f3ec"
   },
   "/home/edith/Pictures/thebookmarkapp/src/components/ProtectedRoute.jsx": {
     "mtime": 1777631020.905527,
@@ -148,20 +148,20 @@
     "hash": "cd1ffd666283d4dbeeabd0a7157e5303"
   },
   "/home/edith/Pictures/thebookmarkapp/src/components/AddBookmarkModal.jsx": {
-    "mtime": 1777631020.9047499,
-    "hash": "b6709ea17575ebbdec8a6c4931d2e629"
+    "mtime": 1779944427.4438894,
+    "hash": "96bc4026609d2f3dbbaa51aa9067e97b"
   },
   "/home/edith/Pictures/thebookmarkapp/src/components/TagSidebar.jsx": {
-    "mtime": 1777631020.905527,
-    "hash": "6d70693e99b3845b3bbaf3ed3ad22ecd"
+    "mtime": 1779944459.991338,
+    "hash": "75c61be738434f368b69d8363df1d3fe"
   },
   "/home/edith/Pictures/thebookmarkapp/src/components/RedirectIfAuthenticated.jsx": {
     "mtime": 1777631020.905527,
     "hash": "124600480d6ec6acea1168e4a3801cae"
   },
   "/home/edith/Pictures/thebookmarkapp/src/components/Sidebar.jsx": {
-    "mtime": 1777631020.905527,
-    "hash": "8dc5f92d54ea9ea747ddc70069d42697"
+    "mtime": 1779944456.0561683,
+    "hash": "fa503d4171a55762b936dbb26829a778"
   },
   "/home/edith/Pictures/thebookmarkapp/src/components/InstallPWA.jsx": {
     "mtime": 1777631020.905527,
@@ -274,6 +274,10 @@
   "/home/edith/Pictures/thebookmarkapp/graphify/README.md": {
     "mtime": 1778739024.9875708,
     "hash": "7149a9336483e20f1f8c647f8dd5d199"
+  },
+  "/home/edith/Pictures/thebookmarkapp/graphify/graph.html": {
+    "mtime": 1778739117.9522011,
+    "hash": "7254fe6ed15a965d89ad7ab6bad833be"
   },
   "/home/edith/Pictures/thebookmarkapp/telegraamsaverbot/docker-compose.yml": {
     "mtime": 1777631936.1980817,

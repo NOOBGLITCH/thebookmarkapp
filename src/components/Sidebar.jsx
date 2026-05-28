@@ -55,7 +55,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
 
     // Listen to reset events
-    useState(() => {
+    useEffect(() => {
         const handleReset = () => {
             setSelectedTag(null)
             setSelectedFolder(null)

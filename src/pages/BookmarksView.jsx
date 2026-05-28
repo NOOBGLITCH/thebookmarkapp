@@ -8,15 +8,30 @@ export default function BookmarksView() {
     const { user } = useAuth()
     const { openEditModal, openAddModal, refreshTrigger } = useBookmarks()
     const [bookmarks, setBookmarks] = useState([])
+    const [folders, setFolders] = useState([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedTag, setSelectedTag] = useState(null)
+    const [selectedFolderId, setSelectedFolderId] = useState(null)
     const [selectedBookmarks, setSelectedBookmarks] = useState([])
     const [shareCopiedId, setShareCopiedId] = useState(null)
     const [favorites, setFavorites] = useState(() => {
         const saved = localStorage.getItem('bookmarkFavorites')
         return saved ? JSON.parse(saved) : []
     })
+
+    const fetchFolders = useCallback(async () => {
+        if (!user) return
+        try {
+            const { data } = await supabase
+                .from('folders')
+                .select('id, name, parent_id')
+                .eq('user_id', user.id)
+            if (data) setFolders(data)
+        } catch (error) {
+            console.error('Error fetching folders in BookmarksView:', error)
+        }
+    }, [user])
 
     const fetchBookmarks = useCallback(async () => {
         try {
@@ -57,17 +72,47 @@ export default function BookmarksView() {
     useEffect(() => {
         if (user) {
             fetchBookmarks()
+            fetchFolders()
         }
-    }, [user, refreshTrigger, fetchBookmarks])
+    }, [user, refreshTrigger, fetchBookmarks, fetchFolders])
 
-    // Listen for tag filter events from sidebar
+    // Listen for tag and folder filter events from sidebar
     useEffect(() => {
         const handleTagFilter = (event) => {
             setSelectedTag(event.detail)
         }
+        const handleFolderFilter = (event) => {
+            setSelectedFolderId(event.detail)
+        }
+        const handleResetFilters = () => {
+            setSelectedTag(null)
+            setSelectedFolderId(null)
+        }
+
         window.addEventListener('filterByTag', handleTagFilter)
-        return () => window.removeEventListener('filterByTag', handleTagFilter)
+        window.addEventListener('filterByFolder', handleFolderFilter)
+        window.addEventListener('resetFilters', handleResetFilters)
+
+        return () => {
+            window.removeEventListener('filterByTag', handleTagFilter)
+            window.removeEventListener('filterByFolder', handleFolderFilter)
+            window.removeEventListener('resetFilters', handleResetFilters)
+        }
     }, [])
+
+    // Listen for refresh bookmarks and folders events
+    useEffect(() => {
+        const handleRefresh = () => {
+            fetchBookmarks()
+            fetchFolders()
+        }
+        window.addEventListener('refreshBookmarks', handleRefresh)
+        window.addEventListener('refreshFolders', fetchFolders)
+        return () => {
+            window.removeEventListener('refreshBookmarks', handleRefresh)
+            window.removeEventListener('refreshFolders', fetchFolders)
+        }
+    }, [fetchBookmarks, fetchFolders])
 
     // Save favorites to localStorage whenever they change
     useEffect(() => {
@@ -212,8 +257,32 @@ export default function BookmarksView() {
         )
     }
 
+    // Helper to get descendant folder IDs
+    const getDescendantFolderIds = useCallback((folderId) => {
+        if (!folderId) return []
+        const ids = [folderId]
+        const recurse = (id) => {
+            folders.forEach(f => {
+                if (f.parent_id === id) {
+                    ids.push(f.id)
+                    recurse(f.id)
+                }
+            })
+        }
+        recurse(folderId)
+        return ids
+    }, [folders])
+
     const filteredBookmarks = bookmarks.filter(bookmark => {
-        // Filter by selected tag first
+        // Filter by selected folder first (including all its descendants)
+        if (selectedFolderId) {
+            const allowedFolderIds = getDescendantFolderIds(selectedFolderId)
+            if (!allowedFolderIds.includes(bookmark.folder_id)) {
+                return false
+            }
+        }
+
+        // Filter by selected tag second
         if (selectedTag && !bookmark.tags?.includes(selectedTag)) {
             return false
         }
@@ -252,6 +321,8 @@ export default function BookmarksView() {
         )
     }
 
+    const selectedFolderObj = folders.find(f => f.id === selectedFolderId)
+
     return (
         <div>
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -260,11 +331,19 @@ export default function BookmarksView() {
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <h1 className="text-3xl font-bold text-primaryText">
-                                {selectedTag ? `Bookmarks tagged with "${selectedTag}"` : 'All Bookmarks'}
+                                {selectedTag && selectedFolderObj ? (
+                                    `Bookmarks in "${selectedFolderObj.name}" tagged with "${selectedTag}"`
+                                ) : selectedTag ? (
+                                    `Bookmarks tagged with "${selectedTag}"`
+                                ) : selectedFolderObj ? (
+                                    `Folder: "${selectedFolderObj.name}"`
+                                ) : (
+                                    'All Bookmarks'
+                                )}
                             </h1>
                             <p className="text-secondaryText mt-1">
                                 {uniqueBookmarks.length} bookmark{uniqueBookmarks.length !== 1 ? 's' : ''}
-                                {(searchQuery || selectedTag) && ` (filtered from ${bookmarks.length})`}
+                                {(searchQuery || selectedTag || selectedFolderId) && ` (filtered from ${bookmarks.length})`}
                                 {selectedBookmarks.length > 0 && ` • ${selectedBookmarks.length} selected`}
                             </p>
                         </div>

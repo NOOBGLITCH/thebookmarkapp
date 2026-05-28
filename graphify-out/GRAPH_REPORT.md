@@ -1,16 +1,16 @@
-# Graph Report - thebookmarkapp  (2026-05-14)
+# Graph Report - thebookmarkapp  (2026-05-28)
 
 ## Corpus Check
-- 72 files · ~43,682 words
+- 72 files · ~47,476 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 384 nodes · 500 edges · 25 communities (24 shown, 1 thin omitted)
+- 388 nodes · 508 edges · 26 communities (25 shown, 1 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3442d58b`
+- Built from commit: `4ae28841`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -35,17 +35,18 @@
 - [[_COMMUNITY_Community 17|Community 17]]
 - [[_COMMUNITY_Community 18|Community 18]]
 - [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 25|Community 25]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `useAuth()` - 27 edges
 2. `Telegram Content Formatter Bot 🤖` - 16 edges
 3. `✅ Bot Finalized & Optimized` - 13 edges
 4. `Deployment Guide - Serverless Telegram Bot` - 12 edges
-5. `generate_tags()` - 10 edges
-6. `webhook()` - 10 edges
-7. `supabase` - 9 edges
-8. `useBookmarks()` - 9 edges
-9. `extractMetadata()` - 9 edges
+5. `extractMetadata()` - 10 edges
+6. `generate_tags()` - 10 edges
+7. `webhook()` - 10 edges
+8. `supabase` - 9 edges
+9. `useBookmarks()` - 9 edges
 10. `get_headers()` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -60,15 +61,15 @@
 - `Landing()` --calls--> `useAuth()`  [EXTRACTED]
   src/pages/Landing.jsx → src/context/AuthContext.jsx
 
-## Communities (25 total, 1 thin omitted)
+## Communities (26 total, 1 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.1
-Nodes (21): AddBookmarkModal(), FolderManager(), ProtectedRoute(), RedirectIfAuthenticated(), SearchBar(), Sidebar(), TagSidebar(), AuthContext (+13 more)
+Cohesion: 0.09
+Nodes (24): AddBookmarkModal(), buildFolderTree(), getFlattenedFolderOptions(), buildFolderTree(), FolderManager(), ProtectedRoute(), RedirectIfAuthenticated(), SearchBar() (+16 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.04
-Nodes (44): Bot Not Responding, code:bash (npm install -g vercel), code:bash (ngrok http 8000), code:bash (vercel logs --follow), code:bash (curl https://api.telegram.org/bot<YOUR_TOKEN>/getWebhookInfo), code:bash (git add .), code:bash (vercel --prod), code:bash (cd /path/to/your/project) (+36 more)
+Cohesion: 0.06
+Nodes (34): Bot Not Responding, code:bash (ngrok http 8000), code:bash (vercel logs --follow), code:bash (curl https://api.telegram.org/bot<YOUR_TOKEN>/getWebhookInfo), code:bash (git add .), code:bash (vercel --prod), code:bash (npm install -g netlify-cli), code:toml ([build]) (+26 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.08
@@ -95,8 +96,8 @@ Cohesion: 0.11
 Nodes (17): create_bookmark_share(resource_id, expires_at?, permission_level?), create_folder_share(resource_id, expires_at?, permission_level?), create_tag_share(resource_id, expires_at?, permission_level?), export_bookmarks(format TEXT, scope TEXT, scope_id UUID?), FlowMark Supabase MCP – API Reference, get_shared_bookmark(token_input TEXT), get_shared_folder(token_input TEXT), get_shared_tag(token_input TEXT) (+9 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.27
-Nodes (12): DOMAIN_TAG_MAP, extractDomain(), extractDomainTags(), extractKeywordsFromText(), extractMetadata(), extractPathKeywords(), fetchURLContent(), generateTagsFromText() (+4 more)
+Cohesion: 0.26
+Nodes (13): DOMAIN_TAG_MAP, extractDomain(), extractDomainTags(), extractKeywordsFromText(), extractMetadata(), extractPathKeywords(), fetchURLContent(), fetchYouTubeMetadata() (+5 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.14
@@ -138,6 +139,10 @@ Nodes (3): Directory: `supabase/migrations/`, Run order (new project), Supabase 
 Cohesion: 0.5
 Nodes (3): If you still get "Failed to fetch" on sign up, Steps, Turn off email verification (confirm email)
 
+### Community 25 - "Community 25"
+Cohesion: 0.2
+Nodes (10): code:bash (npm install -g vercel), code:bash (cd /path/to/your/project), code:bash (vercel env add BOT_TOKEN), code:bash (cd scripts), Manual Deployment Steps, Step 1: Install Vercel CLI, Step 2: Deploy to Vercel, Step 3: Set Environment Variables (+2 more)
+
 ## Knowledge Gaps
 - **183 isolated node(s):** `Json`, `Database`, `DatabaseWithoutInternals`, `DefaultSchema`, `Tables` (+178 more)
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -146,17 +151,17 @@ Nodes (3): If you still get "Failed to fetch" on sign up, Steps, Turn off email 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **Why does `Deployment Guide - Serverless Telegram Bot` connect `Community 1` to `Community 25`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **What connects `Json`, `Database`, `DatabaseWithoutInternals` to the rest of the system?**
   _183 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.04 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.08 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
   _Cohesion score 0.09 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
   _Cohesion score 0.06 - nodes in this community are weakly interconnected._
-- **Should `Community 5` be split into smaller, more focused modules?**
-  _Cohesion score 0.07 - nodes in this community are weakly interconnected._

@@ -144,7 +144,7 @@ export default function TagSidebar({ onSelectTag, selectedTag }) {
                 permission_level: 'view'
             })
             if (error) throw error
-            const token = data?.[0]?.token
+            const token = data?.[0]?.share_token || data?.[0]?.token
             if (!token) throw new Error('No token returned')
             const url = `${window.location.origin}/shared/tag/${token}`
             await navigator.clipboard.writeText(url)

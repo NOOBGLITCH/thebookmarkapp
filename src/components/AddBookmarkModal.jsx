@@ -5,6 +5,46 @@ import { useBookmarks } from '../context/BookmarkContext'
 import { extractMetadata } from '../services/metadataService'
 import TagInput from './TagInput'
 
+// Helper to build folder tree
+function buildFolderTree(foldersList) {
+    const map = {}
+    const roots = []
+    
+    foldersList.forEach(folder => {
+        map[folder.id] = { ...folder, children: [] }
+    })
+    
+    foldersList.forEach(folder => {
+        const mapped = map[folder.id]
+        if (folder.parent_id && map[folder.parent_id]) {
+            map[folder.parent_id].children.push(mapped)
+        } else {
+            roots.push(mapped)
+        }
+    })
+    
+    return roots
+}
+
+function getFlattenedFolderOptions(foldersList) {
+    const tree = buildFolderTree(foldersList)
+    const options = []
+    
+    const traverse = (node, depth = 0) => {
+        options.push({
+            id: node.id,
+            name: node.name,
+            depth: depth
+        })
+        if (node.children) {
+            node.children.forEach(child => traverse(child, depth + 1))
+        }
+    }
+    
+    tree.forEach(rootNode => traverse(rootNode, 0))
+    return options
+}
+
 export default function AddBookmarkModal() {
     const { user } = useAuth()
     const { showAddModal, closeAddModal, editingBookmark, triggerRefresh } = useBookmarks()
@@ -21,7 +61,7 @@ export default function AddBookmarkModal() {
     // Define functions BEFORE using them in useEffect to avoid TDZ
     const fetchFolders = useCallback(async () => {
         if (!user) return
-        const { data } = await supabase.from('folders').select('id, name').eq('user_id', user.id).order('name')
+        const { data } = await supabase.from('folders').select('id, name, parent_id').eq('user_id', user.id).order('name')
         if (data) setFolders(data)
     }, [user])
 
@@ -332,9 +372,9 @@ export default function AddBookmarkModal() {
                             className="w-full px-4 py-2 bg-background border border-gray-700 rounded focus:outline-none focus:border-accent text-primaryText"
                         >
                             <option value="">No Folder</option>
-                            {folders.map(folder => (
+                            {getFlattenedFolderOptions(folders).map(folder => (
                                 <option key={folder.id} value={folder.id}>
-                                    {folder.name}
+                                    {'\u00A0'.repeat(folder.depth * 3)}{folder.depth > 0 ? '↳ ' : ''}{folder.name}
                                 </option>
                             ))}
                         </select>
