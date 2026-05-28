@@ -64,7 +64,7 @@ export default function BookmarksView() {
     const [isMoveModalOpen, setIsMoveModalOpen] = useState(false)
     const [bookmarksToMove, setBookmarksToMove] = useState([])
     const [moveTargetFolderId, setMoveTargetFolderId] = useState('')
-
+    const [toastMessage, setToastMessage] = useState(null)
     // Close context menu on left click anywhere
     useEffect(() => {
         const handleCloseMenu = () => setContextMenu(null)
@@ -703,6 +703,8 @@ export default function BookmarksView() {
                         onClick={async () => {
                             try {
                                 await navigator.clipboard.writeText(contextMenu.bookmark.url)
+                                setToastMessage(`Link copied to clipboard!`)
+                                setTimeout(() => setToastMessage(null), 2500)
                             } catch (err) {
                                 console.error('Failed to copy URL:', err)
                             }
@@ -814,6 +816,28 @@ export default function BookmarksView() {
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Beautiful Success Toast Notification */}
+            {toastMessage && (
+                <div className="fixed bottom-5 right-5 z-50 animate-slide-up flex items-center gap-3 px-4 py-3 bg-gray-900 border-l-4 border-green-500 text-primaryText rounded-lg shadow-2xl max-w-sm border border-gray-800">
+                    <div className="w-5 h-5 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center flex-shrink-0 animate-pulse">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <div className="flex-1 text-sm font-semibold pr-2">
+                        {toastMessage}
+                    </div>
+                    <button 
+                        onClick={() => setToastMessage(null)}
+                        className="text-secondaryText hover:text-primaryText transition flex-shrink-0"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
             )}
         </div>
