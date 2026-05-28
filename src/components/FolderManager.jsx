@@ -35,6 +35,7 @@ export default function FolderManager({ onSelectFolder, selectedFolder: activeFo
     const [newFolderParentId, setNewFolderParentId] = useState('')
     const [menuOpenId, setMenuOpenId] = useState(null)
     const [shareCopiedId, setShareCopiedId] = useState(null)
+    const [toastMessage, setToastMessage] = useState(null)
     const menuRef = useRef(null)
 
     // For renaming folder
@@ -136,8 +137,13 @@ export default function FolderManager({ onSelectFolder, selectedFolder: activeFo
             if (!token) throw new Error('No token returned')
             const url = `${window.location.origin}/shared/folder/${token}`
             await navigator.clipboard.writeText(url)
+            
+            // Set toast and button text states
             setShareCopiedId(folder.id)
+            setToastMessage(`Success: Public link for "${folder.name}" copied!`)
+            
             setTimeout(() => setShareCopiedId(null), 2000)
+            setTimeout(() => setToastMessage(null), 3000)
             setMenuOpenId(null)
         } catch (err) {
             console.error('Share failed:', err)
@@ -601,6 +607,24 @@ export default function FolderManager({ onSelectFolder, selectedFolder: activeFo
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Beautiful Success Toast Notification */}
+            {toastMessage && (
+                <div className="fixed bottom-5 right-5 z-50 animate-slide-up flex items-center gap-3 px-4 py-3 bg-gray-900 border-l-4 border-green-500 text-primaryText rounded-lg shadow-2xl max-w-sm border border-gray-800">
+                    <div className="w-5 h-5 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center flex-shrink-0 animate-pulse">
+                        <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex-1 text-sm font-semibold pr-2">
+                        {toastMessage}
+                    </div>
+                    <button 
+                        onClick={() => setToastMessage(null)}
+                        className="text-secondaryText hover:text-primaryText transition flex-shrink-0"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
                 </div>
             )}
         </div>
