@@ -276,19 +276,48 @@ async function fetchYouTubeMetadata(url) {
                 metaKeywords: 'youtube, video'
             }
         }
-    } catch (err) {
+    } catch {
         console.warn('Direct YouTube OEmbed failed, will try via proxy if needed')
     }
     return null
 }
 
 /**
- * Fetch URL content with multiple CORS proxy fallbacks and timeout
+ * Fetch URL content via internal API proxy (for production/Vercel)
  */
-async function fetchURLContent(url) {
-    const TIMEOUT = 4000 // Reduced to 4 second timeout for faster feedback
+async function fetchURLContentViaAPI(url) {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 6000)
 
-    // Helper to add timeout to fetch
+    const response = await fetch('/api/metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+        signal: controller.signal,
+    })
+
+    clearTimeout(timeout)
+
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}))
+        throw new Error(err.error || `Server error (HTTP ${response.status})`)
+    }
+
+    const data = await response.json()
+
+    if (data.error) {
+        throw new Error(data.error)
+    }
+
+    return data.html
+}
+
+/**
+ * Fetch URL content with direct fetch + CORS proxy fallbacks (for dev)
+ */
+async function fetchURLContentDirect(url) {
+    const TIMEOUT = 4000
+
     const fetchWithTimeout = (url, options, timeout) => {
         return Promise.race([
             fetch(url, options),
@@ -298,86 +327,82 @@ async function fetchURLContent(url) {
         ])
     }
 
-    // List of CORS proxies ordered by speed (fastest first)
     const proxies = [
-        `https://corsproxy.io/?${encodeURIComponent(url)}`, // Fastest
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
         `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
         `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
     ]
 
-    // Try direct fetch first (will work in production/deployed environments)
     try {
         const response = await fetchWithTimeout(url, {
             method: 'GET',
             mode: 'cors',
-            headers: {
-                'Accept': 'text/html,application/xhtml+xml'
-            }
-        }, 1500) // Reduced to 1.5s timeout for direct fetch
+            headers: { 'Accept': 'text/html,application/xhtml+xml' }
+        }, 1500)
 
         if (response.ok) {
             return await response.text()
         }
     } catch {
-        console.log('Direct fetch failed (expected in localhost), trying proxies...')
+        console.log('Direct fetch failed, trying proxies...')
     }
 
-    // Try all proxies in parallel and return the first successful one
     const proxyPromises = proxies.map(async (proxyUrl) => {
-        try {
-            const response = await fetchWithTimeout(proxyUrl, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'text/html,application/xhtml+xml,application/json'
-                }
-            }, TIMEOUT)
+        const response = await fetchWithTimeout(proxyUrl, {
+            method: 'GET',
+            headers: { 'Accept': 'text/html,application/xhtml+xml,application/json' }
+        }, TIMEOUT)
 
-            if (response.ok) {
-                const text = await response.text()
-                if (text && text.length > 100) { // Ensure we got actual content
-                    console.log(`✓ Fetched via: ${proxyUrl.split('?')[0]}`)
-                    return text
-                }
+        if (response.ok) {
+            const text = await response.text()
+            if (text && text.length > 100) {
+                return text
             }
-            throw new Error('Invalid response')
-        } catch (error) {
-            throw error
         }
+        throw new Error('Invalid response')
     })
 
-    // Helper to mimic Promise.any robustly across all browsers and environments
     const promiseAny = (promises) => {
-        if (Promise.any) {
-            return Promise.any(promises)
-        }
+        if (Promise.any) return Promise.any(promises)
         return new Promise((resolve, reject) => {
             let rejectedCount = 0
             const errors = []
-            if (promises.length === 0) {
-                reject(new Error('No promises provided'))
-                return
-            }
+            if (promises.length === 0) { reject(new Error('No promises')); return }
             promises.forEach((p, index) => {
                 Promise.resolve(p).then(resolve).catch((err) => {
                     errors[index] = err
                     rejectedCount++
                     if (rejectedCount === promises.length) {
-                        const aggError = typeof AggregateError !== 'undefined'
-                            ? new AggregateError(errors, 'All promises were rejected')
-                            : new Error('All promises were rejected')
-                        reject(aggError)
+                        const ErrConstructor = globalThis.AggregateError || Error
+                        const aggErr = new ErrConstructor(errors, 'All proxies rejected')
+                        reject(aggErr)
                     }
                 })
             })
         })
     }
 
-    // Query all proxies in parallel and return the first success
-    try {
-        return await promiseAny(proxyPromises)
-    } catch (error) {
-        console.error('All proxies failed:', error)
-        throw new Error('Unable to reach the website. This might be due to CORS restrictions or the site blocking proxies. Please enter details manually.')
+    return await promiseAny(proxyPromises)
+}
+
+/**
+ * Fetch URL content - uses API proxy in production, direct fetch in dev
+ */
+async function fetchURLContent(url) {
+    if (import.meta.env.PROD) {
+        try {
+            return await fetchURLContentViaAPI(url)
+        } catch (error) {
+            console.error('API proxy failed:', error)
+            throw error
+        }
+    } else {
+        try {
+            return await fetchURLContentDirect(url)
+        } catch (error) {
+            console.error('All fetch methods failed:', error)
+            throw new Error('Unable to reach the website. This might be due to CORS restrictions or the site blocking proxies. Please enter details manually.')
+        }
     }
 }
 
